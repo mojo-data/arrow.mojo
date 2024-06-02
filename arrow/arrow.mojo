@@ -18,7 +18,9 @@ struct Bitmap:
         source: https://arrow.apache.org/docs/format/Columnar.html#buffer-alignment-and-padding.
         """
         let num_bytes = ((len(bools)) + 7) // 8
-        let num_bytes_with_padding = ((num_bytes + PADDING - 1) // PADDING) * PADDING
+        let num_bytes_with_padding = (
+            (num_bytes + PADDING - 1) // PADDING
+        ) * PADDING
         let ptr = Pointer[UInt8].aligned_alloc(PADDING, num_bytes_with_padding)
         memset_zero(ptr, num_bytes_with_padding)
 
@@ -58,8 +60,12 @@ struct ArrowFixedWidthBuffer[T: AnyType]:
     fn __init__(inout self, values: DynamicVector[T]):
         let byte_width = sizeof[T]()
         let num_bytes = len(values) * byte_width
-        let num_bytes_with_padding = ((num_bytes + PADDING - 1) // PADDING) * PADDING
-        let ui8_ptr = Pointer[UInt8].aligned_alloc(PADDING, num_bytes_with_padding)
+        let num_bytes_with_padding = (
+            (num_bytes + PADDING - 1) // PADDING
+        ) * PADDING
+        let ui8_ptr = Pointer[UInt8].aligned_alloc(
+            PADDING, num_bytes_with_padding
+        )
         let ptr = ui8_ptr.bitcast[T]()
         memset_zero(ptr, num_bytes_with_padding)
 
