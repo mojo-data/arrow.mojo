@@ -2,6 +2,7 @@ var ARROW_FLAG_DICTIONARY_ORDERED = 1
 var ARROW_FLAG_NULLABLE = 2
 var ARROW_FLAG_MAP_KEYS_SORTED = 4
 
+
 @value
 struct ArrowSchema:
     var format: String
@@ -13,6 +14,7 @@ struct ArrowSchema:
     var dictionary: Pointer[Self]
     var release: Pointer[fn (Pointer[Self]) -> None]
     var private_data: Pointer[UInt8]
+
 
 @value
 struct ArrowArray:
