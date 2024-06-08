@@ -53,6 +53,7 @@ struct ArrowBoolArray:
 struct ArrowFixedWidthBuffer[T: AnyRegType]:
     # maybe use Dtype for T instead of AnyType, but DynamicVector uses AnyType
     var data: Pointer[UInt8]
+    var view: Pointer[T]
     var length: Int
     var mem_use: Int
 
@@ -72,13 +73,13 @@ struct ArrowFixedWidthBuffer[T: AnyRegType]:
             ptr.store(i, values[i])
 
         self.data = ui8_ptr
+        self.view = ptr
         self.length = len(values)
         self.mem_use = num_bytes_with_padding
 
     fn __getitem__(self, index: Int) -> T:
         # TODO: bounds check
-        var ptr = self.data.bitcast[T]()
-        return ptr.load(index)
+        return self.view.load(index)
 
     fn __len__(self) -> Int:
         return self.length
