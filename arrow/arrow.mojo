@@ -5,7 +5,7 @@ from memory import memset_zero
 alias PADDING = 64
 
 
-struct Bitmap(AnyType):
+struct Bitmap:
     var data: Pointer[UInt8]
     var length: Int
     var mem_use: Int
@@ -53,7 +53,7 @@ struct ArrowBoolArray:
     var buffer: Bitmap
 
 
-struct ArrowFixedWidthBuffer[T: AnyTrivialRegType](AnyType):
+struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
     # maybe use Dtype for T instead of AnyType, but DynamicVector uses AnyType
     var data: Pointer[UInt8]
     var view: Pointer[T]
