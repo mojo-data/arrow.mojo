@@ -5,7 +5,7 @@ from memory import memset_zero
 alias PADDING = 64
 
 
-struct Bitmap:
+struct Bitmap(AnyType):
     var data: Pointer[UInt8]
     var length: Int
     var mem_use: Int
@@ -43,6 +43,9 @@ struct Bitmap:
 
     fn __len__(self) -> Int:
         return self.length
+
+    fn __del__(owned self):
+        self.data.free()
 
 
 struct ArrowBoolArray:
