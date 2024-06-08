@@ -5,7 +5,7 @@ from memory import memset_zero
 alias PADDING = 64
 
 
-struct Bitmap:
+struct Bitmap(AnyType):
     var data: Pointer[UInt8]
     var length: Int
     var mem_use: Int
@@ -44,13 +44,16 @@ struct Bitmap:
     fn __len__(self) -> Int:
         return self.length
 
+    fn __del__(owned self):
+        self.data.free()
+
 
 struct ArrowBoolArray:
     var validity: Bitmap
     var buffer: Bitmap
 
 
-struct ArrowFixedWidthBuffer[T: AnyRegType]:
+struct ArrowFixedWidthBuffer[T: AnyTrivialRegType](AnyType):
     # maybe use Dtype for T instead of AnyType, but DynamicVector uses AnyType
     var data: Pointer[UInt8]
     var view: Pointer[T]
@@ -83,3 +86,6 @@ struct ArrowFixedWidthBuffer[T: AnyRegType]:
 
     fn __len__(self) -> Int:
         return self.length
+
+    fn __del__(owned self):
+        self.data.free()
