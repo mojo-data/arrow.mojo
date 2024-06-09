@@ -17,7 +17,6 @@ def test_ints():
     assert_equal(int_arrow_buf[3], 7643)
     assert_equal(int_arrow_buf[4], 69)
 
-
     assert_equal(len(int_arrow_buf), 5)
     assert_equal(int_arrow_buf.mem_use, 64)
 
