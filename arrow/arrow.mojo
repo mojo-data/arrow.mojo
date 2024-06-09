@@ -6,6 +6,7 @@ alias PADDING = 64
 
 
 struct Bitmap:
+    # TODO: make copyable and movable
     var data: Pointer[UInt8]
     var length: Int
     var mem_use: Int
@@ -57,10 +58,13 @@ struct ArrowBoolArray:
 
 
 struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
-    # maybe use Dtype for T instead of AnyType, but DynamicVector uses AnyType
-    var data: Pointer[UInt8]
-    var view: Pointer[T]
+    # TODO: support null values
     var length: Int
+    var null_count: Int
+    var validity: Bitmap
+    var value: Pointer[UInt8]
+    var view: Pointer[T]
+
     var mem_use: Int
 
     fn __init__(inout self, values: List[T]):
@@ -75,10 +79,16 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
         var ptr = ui8_ptr.bitcast[T]()
         memset_zero(ptr, num_bytes_with_padding)
 
-        for i in range(values.size):
-            ptr.store(i, values[i])
+        var validity_list = List[Bool](len(values))
 
-        self.data = ui8_ptr
+        for i in range(values.size):
+            validity_list.append(True)
+            var val = values[i]
+            ptr.store(i, val)
+
+        self.value = ui8_ptr
+        self.validity = Bitmap(validity_list)
+        self.null_count = 0
         self.view = ptr
         self.length = len(values)
         self.mem_use = num_bytes_with_padding
@@ -92,4 +102,4 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
         return self.length
 
     fn __del__(owned self):
-        self.data.free()
+        self.value.free()
