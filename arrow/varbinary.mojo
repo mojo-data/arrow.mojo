@@ -8,6 +8,7 @@ struct ArrowStringVector:
     var validity: Bitmap
     var offsets: List[Int]
     var value_buffer: Pointer[UInt8]
+    var mem_used: Int
 
     fn __init__(inout self, values: List[String]):
         var validity_list = List[Bool](capacity=len(values))
@@ -21,6 +22,7 @@ struct ArrowStringVector:
         self.value_buffer = Pointer[UInt8].alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
+        self.mem_used = num_bytes_with_padding
 
         offset_list.append(0)
         var offset_cursor = 0

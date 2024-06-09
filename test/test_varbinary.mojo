@@ -24,9 +24,6 @@ def test_string_vector():
     assert_equal(string_vec[6], "of")
     assert_equal(string_vec[7], "strings")
 
-    # assert_equal(len(string_vec), 8)
-    # assert_equal(string_vec.mem_use, 64)
-
 
 def main():
     test_string_vector()
