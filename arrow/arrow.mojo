@@ -3,6 +3,7 @@ from memory import memset_zero
 
 
 alias PADDING = 64
+alias ALIGNMENT = 64
 
 
 struct Bitmap:
@@ -21,7 +22,7 @@ struct Bitmap:
             (num_bytes + PADDING - 1) // PADDING
         ) * PADDING
         var ptr = Pointer[UInt8].alloc(
-            num_bytes_with_padding, alignment=PADDING
+            num_bytes_with_padding, alignment=ALIGNMENT
         )
         memset_zero(ptr, num_bytes_with_padding)
 
@@ -74,7 +75,7 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
             (num_bytes + PADDING - 1) // PADDING
         ) * PADDING
         var ui8_ptr = Pointer[UInt8].alloc(
-            num_bytes_with_padding, alignment=PADDING
+            num_bytes_with_padding, alignment=ALIGNMENT
         )
         var ptr = ui8_ptr.bitcast[T]()
         memset_zero(ptr, num_bytes_with_padding)
@@ -94,6 +95,58 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
         self.mem_use = num_bytes_with_padding
 
     fn __getitem__(self, index: Int) raises -> T:
+        if index < 0 or index >= self.length:
+            raise Error("index out of range for ArrowFixedWidthBuffer")
+        return self.view.load(index)
+
+    fn __len__(self) -> Int:
+        return self.length
+
+    fn __del__(owned self):
+        self.value.free()
+
+
+struct ArrowIntBuffer:
+    """
+    Temporary solution until we can create ArrowFixedWidthBuffer[Int]
+    Depends on https://github.com/modularml/mojo/issues/2956 to be fixed.
+    """
+
+    var length: Int
+    var null_count: Int
+    var validity: Bitmap
+    var value: Pointer[UInt8]
+    var view: Pointer[Int]
+
+    var mem_use: Int
+
+    fn __init__(inout self, values: List[Int]):
+        var byte_width = sizeof[Int]()
+        var num_bytes = len(values) * byte_width
+        var num_bytes_with_padding = (
+            (num_bytes + PADDING - 1) // PADDING
+        ) * PADDING
+        var ui8_ptr = Pointer[UInt8].alloc(
+            num_bytes_with_padding, alignment=ALIGNMENT
+        )
+        var ptr = ui8_ptr.bitcast[Int]()
+        memset_zero(ptr, num_bytes_with_padding)
+
+        var validity_list = List[Bool](len(values))
+
+        for i in range(values.size):
+            validity_list.append(True)
+            var val = values[i]
+            ptr.store(i, val)
+
+        self.value = ui8_ptr
+        self.validity = Bitmap(validity_list)
+        self.null_count = 0
+        self.view = ptr
+        self.length = len(values)
+        self.mem_use = num_bytes_with_padding
+
+    fn __getitem__(self, index: Int) raises -> Int:
         if index < 0 or index >= self.length:
             raise Error("index out of range for ArrowFixedWidthBuffer")
         return self.view.load(index)

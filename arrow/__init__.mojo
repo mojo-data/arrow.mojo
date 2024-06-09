@@ -1,1 +1,6 @@
-from arrow.arrow import Bitmap, ArrowBoolArray, ArrowFixedWidthBuffer
+from arrow.arrow import (
+    Bitmap,
+    ArrowBoolArray,
+    ArrowFixedWidthBuffer,
+    ArrowIntBuffer,
+)
