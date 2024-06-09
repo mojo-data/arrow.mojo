@@ -53,7 +53,7 @@ struct ArrowBoolArray:
     var buffer: Bitmap
 
 
-struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
+struct ArrowFixedWidthBuffer[T: AnyTrivialRegType](AnyType):
     # maybe use Dtype for T instead of AnyType, but DynamicVector uses AnyType
     var data: Pointer[UInt8]
     var view: Pointer[T]
