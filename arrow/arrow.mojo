@@ -35,7 +35,10 @@ struct Bitmap:
         self.length = len(bools)
         self.mem_use = num_bytes_with_padding
 
-    fn __getitem__(self, index: Int) -> Bool:
+    fn __getitem__(self, index: Int) raises -> Bool:
+        if index < 0 or index >= self.length:
+            raise Error("index out of range for Bitmap")
+
         var byte_index = index // 8
         var bit_index = index % 8
         var bit_mask: UInt8 = 0b10000000 >> bit_index
@@ -80,8 +83,9 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
         self.length = len(values)
         self.mem_use = num_bytes_with_padding
 
-    fn __getitem__(self, index: Int) -> T:
-        # TODO: bounds check
+    fn __getitem__(self, index: Int) raises -> T:
+        if index < 0 or index >= self.length:
+            raise Error("index out of range for ArrowFixedWidthBuffer")
         return self.view.load(index)
 
     fn __len__(self) -> Int:
