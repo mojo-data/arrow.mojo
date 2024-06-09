@@ -1,4 +1,5 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
+from arrow.arrow import Bitmap
 
 
 struct ArrowStringVector:
@@ -9,8 +10,8 @@ struct ArrowStringVector:
     var value_buffer: Pointer[UInt8]
 
     fn __init__(inout self, values: List[String]):
-        var validity_list = List[Bool](len(values))
-        var offset_list = List[Int](len(values) + 1)
+        var validity_list = List[Bool](capacity=len(values))
+        var offset_list = List[Int](capacity=len(values) + 1)
 
         # Calculate the size of the buffer and allocate it
         var buffer_size = 0
@@ -38,10 +39,14 @@ struct ArrowStringVector:
 
     fn __getitem__(self, index: Int) raises -> String:
         if index < 0 or index >= self.length:
-            raise Error("index out of range for ArrowVarBinaryBuffer")
+            raise Error("index out of range for ArrowStringVector")
         var start = self.offsets[index]
         var length = self.offsets[index + 1] - start
+
         var bytes = List[UInt8](length)
+        for i in range(length):
+            bytes.append(self.value_buffer.load(start + i))
+        bytes.append(0)  # null-terminate the string
         return String(bytes)
 
     fn __len__(self) -> Int:
