@@ -8,7 +8,6 @@ def test_arrow_c_load():
 
     df = pd.read_csv("./test_data.csv")
     rb = pa.record_batch(df)
-    # rb.schema. = "some_name"
 
     var schema = UnsafePointer[ArrowSchema]().alloc(1)
     var array = UnsafePointer[ArrowArray]().alloc(1)
