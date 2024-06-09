@@ -1,9 +1,6 @@
 from memory.unsafe import Pointer
 from memory import memset_zero
-
-
-alias PADDING = 64
-alias ALIGNMENT = 64
+from arrow.util import PADDING, ALIGNMENT, get_num_bytes_with_padding
 
 
 struct Bitmap:
@@ -18,9 +15,7 @@ struct Bitmap:
         source: https://arrow.apache.org/docs/format/Columnar.html#buffer-alignment-and-padding.
         """
         var num_bytes = ((len(bools)) + 7) // 8
-        var num_bytes_with_padding = (
-            (num_bytes + PADDING - 1) // PADDING
-        ) * PADDING
+        var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
         var ptr = Pointer[UInt8].alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
@@ -71,9 +66,7 @@ struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
     fn __init__(inout self, values: List[T]):
         var byte_width = sizeof[T]()
         var num_bytes = len(values) * byte_width
-        var num_bytes_with_padding = (
-            (num_bytes + PADDING - 1) // PADDING
-        ) * PADDING
+        var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
         var ui8_ptr = Pointer[UInt8].alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
@@ -123,9 +116,7 @@ struct ArrowIntVector:
     fn __init__(inout self, values: List[Int]):
         var byte_width = sizeof[Int]()
         var num_bytes = len(values) * byte_width
-        var num_bytes_with_padding = (
-            (num_bytes + PADDING - 1) // PADDING
-        ) * PADDING
+        var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
         var ui8_ptr = Pointer[UInt8].alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
