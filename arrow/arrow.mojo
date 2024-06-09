@@ -53,12 +53,12 @@ struct Bitmap:
         self.data.free()
 
 
-struct ArrowBoolArray:
+struct ArrowBoolVector:
     var validity: Bitmap
     var buffer: Bitmap
 
 
-struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
+struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
     # TODO: support null values
     var length: Int
     var null_count: Int
@@ -96,7 +96,7 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
 
     fn __getitem__(self, index: Int) raises -> T:
         if index < 0 or index >= self.length:
-            raise Error("index out of range for ArrowFixedWidthBuffer")
+            raise Error("index out of range for ArrowFixedWidthVector")
         return self.view.load(index)
 
     fn __len__(self) -> Int:
@@ -106,9 +106,9 @@ struct ArrowFixedWidthBuffer[T: AnyTrivialRegType]:
         self.value.free()
 
 
-struct ArrowIntBuffer:
+struct ArrowIntVector:
     """
-    Temporary solution until we can create ArrowFixedWidthBuffer[Int]
+    Temporary solution until we can create ArrowFixedWidthVector[Int]
     Depends on https://github.com/modularml/mojo/issues/2956 to be fixed.
     """
 
@@ -148,7 +148,7 @@ struct ArrowIntBuffer:
 
     fn __getitem__(self, index: Int) raises -> Int:
         if index < 0 or index >= self.length:
-            raise Error("index out of range for ArrowFixedWidthBuffer")
+            raise Error("index out of range for ArrowIntVector")
         return self.view.load(index)
 
     fn __len__(self) -> Int:

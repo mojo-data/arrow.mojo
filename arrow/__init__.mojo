@@ -1,6 +1,6 @@
 from arrow.arrow import (
     Bitmap,
-    ArrowBoolArray,
-    ArrowFixedWidthBuffer,
-    ArrowIntBuffer,
+    ArrowBoolVector,
+    ArrowFixedWidthVector,
+    ArrowIntVector,
 )

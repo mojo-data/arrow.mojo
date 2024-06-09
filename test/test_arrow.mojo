@@ -1,4 +1,4 @@
-from arrow import ArrowIntBuffer
+from arrow import ArrowIntVector
 from testing import assert_equal
 
 
@@ -10,7 +10,7 @@ def test_ints():
     ints.append(7643)
     ints.append(69)
 
-    var int_arrow_buf = ArrowIntBuffer(ints)
+    var int_arrow_buf = ArrowIntVector(ints)
     assert_equal(int_arrow_buf[0], -11)
     assert_equal(int_arrow_buf[1], 2)
     assert_equal(int_arrow_buf[2], 4)
