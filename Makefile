@@ -2,10 +2,6 @@
 test: fmt
 	@mojo test -I .
 
-.PHONY: run
-run: fmt
-	@mojo run arrow/main.mojo
-
 .PHONY: build
 build: fmt
 	@mkdir -p dist

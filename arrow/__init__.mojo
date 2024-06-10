@@ -4,3 +4,5 @@ from arrow.arrow import (
     ArrowFixedWidthVector,
     ArrowIntVector,
 )
+
+from arrow.varbinary import ArrowStringVector
