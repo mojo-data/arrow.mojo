@@ -45,7 +45,7 @@ struct ArrowStringVector:
         var start = self.offsets[index]
         var length = self.offsets[index + 1] - start
 
-        var bytes = List[UInt8](capacity=length)
+        var bytes = List[UInt8](capacity=length + 1)
         for i in range(length):
             bytes.append(self.value_buffer.load(start + i))
         bytes.append(0)  # null-terminate the string
