@@ -15,3 +15,7 @@ clean:
 fmt: 
 	@mojo format arrow
 	@mojo format test
+
+.PHONY: setup
+setup:
+	@POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
