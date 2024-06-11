@@ -13,8 +13,7 @@ clean:
 
 .PHONY: fmt
 fmt: 
-	@mojo format arrow
-	@mojo format test
+	@mojo format arrow test
 
 .PHONY: setup
 setup:
