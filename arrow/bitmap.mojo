@@ -5,7 +5,7 @@ from arrow.util import PADDING, ALIGNMENT, get_num_bytes_with_padding
 
 struct Bitmap(StringableRaising):
     """Bitmap according to the Apache Arrow specification which can found here.
-    
+
     Source: https://arrow.apache.org/docs/format/Columnar.html#validity-bitmaps
 
     The source provides this pseudo code:
@@ -23,6 +23,7 @@ struct Bitmap(StringableRaising):
               0  0  1  0  1  0  1  1
     ```
     """
+
     var data: Pointer[UInt8]
     var length: Int
     var mem_used: Int

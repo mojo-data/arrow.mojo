@@ -76,8 +76,8 @@ struct ArrowIntVector:
         var ui8_ptr = Pointer[UInt8].alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
+        memset_zero(ui8_ptr, num_bytes_with_padding)
         var ptr = ui8_ptr.bitcast[Int]()
-        memset_zero(ptr, num_bytes_with_padding)
 
         var validity_list = List[Bool](len(values))
 
