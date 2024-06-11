@@ -1,6 +1,6 @@
 .PHONY: test
 test: fmt
-	@mojo test -I .
+	@poetry run mojo test -I .
 
 .PHONY: build
 build: fmt
@@ -18,4 +18,7 @@ fmt:
 
 .PHONY: setup
 setup:
-	@POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
+	@echo "\n***\nInstalling python dependencies\n***\n"
+	POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
+	@echo "\n***\nRunning tests (they should all pass)\n***\n"
+	poetry run mojo test -I .

@@ -2,7 +2,7 @@ from arrow import ArrowIntVector
 from testing import assert_equal
 
 
-def test_ints():
+def test_ArrowIntVector():
     var ints = List[Int]()
     ints.append(-11)
     ints.append(2)
@@ -22,4 +22,4 @@ def test_ints():
 
 
 def main():
-    test_ints()
+    test_ArrowIntVector()
