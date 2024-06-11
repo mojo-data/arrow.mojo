@@ -1,3 +1,4 @@
 dist/
 .venv/
 install_id
+**/.DS_Store

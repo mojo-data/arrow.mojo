@@ -2,10 +2,6 @@
 test: fmt
 	@mojo test -I .
 
-.PHONY: run
-run: fmt
-	@mojo run arrow/main.mojo
-
 .PHONY: build
 build: fmt
 	@mkdir -p dist
@@ -19,3 +15,7 @@ clean:
 fmt: 
 	@mojo format arrow
 	@mojo format test
+
+.PHONY: setup
+setup:
+	@POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
