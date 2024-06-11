@@ -11,7 +11,7 @@ def test_ArrowIntVector():
     ints.append(69)
 
     var int_arrow_buf = ArrowIntVector(ints)
-    
+
     assert_equal(int_arrow_buf[0], -11)
     assert_equal(int_arrow_buf[1], 2)
     assert_equal(int_arrow_buf[2], 4)
@@ -24,4 +24,3 @@ def test_ArrowIntVector():
 
 def main():
     test_ArrowIntVector()
-    print("end")
