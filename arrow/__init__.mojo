@@ -1,8 +1,9 @@
 from arrow.arrow import (
-    Bitmap,
     ArrowBoolVector,
     ArrowFixedWidthVector,
     ArrowIntVector,
 )
+
+from arrow.bitmap import Bitmap
 
 from arrow.varbinary import ArrowStringVector
