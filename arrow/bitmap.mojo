@@ -4,7 +4,25 @@ from arrow.util import PADDING, ALIGNMENT, get_num_bytes_with_padding
 
 
 struct Bitmap(StringableRaising):
-    # TODO: make copyable and movable
+    """Bitmap according to the Apache Arrow specification which can found here.
+    
+    Source: https://arrow.apache.org/docs/format/Columnar.html#validity-bitmaps
+
+    The source provides this pseudo code:
+    ```
+    is_valid[j] -> bitmap[j / 8] & (1 << (j % 8))
+    ```
+
+    And the following explanation:
+    > We use least-significant bit (LSB) numbering (also known as bit-endianness). This means that within a group of 8 bits, we read right-to-left:
+    ```
+    values = [0, 1, null, 2, null, 3]
+
+    bitmap
+    j mod 8   7  6  5  4  3  2  1  0
+              0  0  1  0  1  0  1  1
+    ```
+    """
     var data: Pointer[UInt8]
     var length: Int
     var mem_used: Int
@@ -31,12 +49,16 @@ struct Bitmap(StringableRaising):
         self.length = len(bools)
         self.mem_used = num_bytes_with_padding
 
-    fn __getitem__(self, index: Int) raises -> Bool:
-        if index < 0 or index >= self.length:
-            raise Error("index out of range for Bitmap")
+    @always_inline
+    fn _unsafe_getitem(self, index: Int) -> Bool:
         var byte_index = index // 8
         var bitmask: UInt8 = 1 << (index % 8)
         return ((self.data.load(byte_index) & bitmask)).__bool__()
+
+    fn __getitem__(self, index: Int) raises -> Bool:
+        if index < 0 or index >= self.length:
+            raise Error("index out of range for Bitmap")
+        return self._unsafe_getitem(index)
 
     fn __len__(self) -> Int:
         return self.length
