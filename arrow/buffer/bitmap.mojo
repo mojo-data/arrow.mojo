@@ -56,10 +56,13 @@ struct Bitmap(StringableRaising):
 
     fn _unsafe_setitem(self, index: Int, value: Bool):
         """Doesn't check if index is out of bounds.
-        Only works if memory is true, doesn't work if memory is 1 and value is False"""
+        Only works if memory is true, doesn't work if memory is 1 and value is False
+        """
         var byte_index = index // 8
         var bitmask = UInt8(value.__int__()) << (index % 8)
-        var new_byte = self._buffer.load(byte_index) | bitmask  # only works if memory is 0
+        var new_byte = self._buffer.load(
+            byte_index
+        ) | bitmask  # only works if memory is 0
         self._buffer.store(byte_index, new_byte)
 
     @always_inline
