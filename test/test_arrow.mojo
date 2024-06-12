@@ -19,7 +19,8 @@ def test_ArrowIntVector():
     assert_equal(int_arrow_buf[4], 69)
 
     assert_equal(len(int_arrow_buf), 5)
-    assert_equal(int_arrow_buf.mem_use, 64)
+    assert_equal(int_arrow_buf.mem_used, 128)
+    assert_equal(int_arrow_buf.value_buffer.mem_used, 64)
 
 
 def main():

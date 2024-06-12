@@ -24,37 +24,58 @@ struct Bitmap(StringableRaising):
     ```
     """
 
-    var data: Pointer[UInt8]
+    var _buffer: Pointer[UInt8]
     var length: Int
     var mem_used: Int
+    # TODO maybe buffers shouldn't have length and mem_used, just size.
+    # The layouts that use the buffers can keep track of their length.
 
-    fn __init__(inout self, bools: List[Bool]):
+    fn __init__(inout self, length_unpadded: Int):
+        """Creates a new Bitmap that supports at least `length_unpadded` elements.
+
+        Args:
+            length_unpadded: The number of elements the Bitmap should support.
+                Buffers are typically padded to 32, 64, or 128 bytes but it
+                depends on the architecture.
         """
-        Arrow buffers are recommended to have an alignment and padding of 64 bytes
-        source: https://arrow.apache.org/docs/format/Columnar.html#buffer-alignment-and-padding.
-        """
-        var num_bytes = ((len(bools)) + 7) // 8
+        var num_bytes = (length_unpadded + 7) // 8
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
-        var ptr = Pointer[UInt8].alloc(
+
+        self._buffer = Pointer[UInt8].alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
-        memset_zero(ptr, num_bytes_with_padding)
+        memset_zero(self._buffer, num_bytes_with_padding)
+        self.length = length_unpadded
+        self.mem_used = num_bytes_with_padding
+
+    fn __init__(inout self, bools: List[Bool]):
+        self = Self(len(bools))
 
         for i in range(len(bools)):
-            var byte_index = (i // 8)
-            var bitmask = UInt8(bools[i].__int__()) << (i % 8)
-            var new_byte = ptr.load(byte_index) | bitmask
-            ptr.store(byte_index, new_byte)
+            self._unsafe_setitem(i, bools[i])
 
-        self.data = ptr
-        self.length = len(bools)
-        self.mem_used = num_bytes_with_padding
+    fn _unsafe_setitem(self, index: Int, value: Bool):
+        """Doesn't check if index is out of bounds.
+        Only works if memory is true, doesn't work if memory is 1 and value is False
+        """
+        var byte_index = index // 8
+        var bitmask = UInt8(value.__int__()) << (index % 8)
+        var new_byte = self._buffer.load(
+            byte_index
+        ) | bitmask  # only works if memory is 0
+        self._buffer.store(byte_index, new_byte)
 
     @always_inline
     fn _unsafe_getitem(self, index: Int) -> Bool:
+        """Doesn't check if index is out of bounds.
+
+        Follows this pseudo code from the Apache Arrow specification
+
+        `is_valid[j] -> bitmap[j / 8] & (1 << (j % 8))`
+        """
         var byte_index = index // 8
         var bitmask: UInt8 = 1 << (index % 8)
-        return ((self.data.load(byte_index) & bitmask)).__bool__()
+        return ((self._buffer.load(byte_index) & bitmask)).__bool__()
 
     fn __getitem__(self, index: Int) raises -> Bool:
         if index < 0 or index >= self.length:
@@ -65,17 +86,19 @@ struct Bitmap(StringableRaising):
         return self.length
 
     fn __del__(owned self):
-        self.data.free()
+        self._buffer.free()
 
     fn __moveinit__(inout self, owned existing: Bitmap):
-        self.data = existing.data
+        self._buffer = existing._buffer
         self.length = existing.length
         self.mem_used = existing.mem_used
 
     fn __copyinit__(inout self, existing: Bitmap):
-        self.data = Pointer[UInt8].alloc(existing.mem_used, alignment=ALIGNMENT)
+        self._buffer = Pointer[UInt8].alloc(
+            existing.mem_used, alignment=ALIGNMENT
+        )
         for i in range(existing.mem_used):
-            self.data.store(i, existing.data.load(i))
+            self._buffer.store(i, existing._buffer.load(i))
         self.length = existing.length
         self.mem_used = existing.mem_used
 
