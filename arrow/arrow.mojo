@@ -1,7 +1,7 @@
 from memory.unsafe import Pointer
 from memory import memset_zero
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
-from arrow.bitmap import Bitmap
+from arrow.buffer.bitmap import Bitmap
 
 
 struct ArrowBoolVector:

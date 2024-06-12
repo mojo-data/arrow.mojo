@@ -4,6 +4,6 @@ from arrow.arrow import (
     ArrowIntVector,
 )
 
-from arrow.bitmap import Bitmap
+from arrow.buffer.bitmap import Bitmap
 
 from arrow.varbinary import ArrowStringVector
