@@ -31,6 +31,13 @@ struct Bitmap(StringableRaising):
     # The layouts that use the buffers can keep track of their length.
 
     fn __init__(inout self, length_unpadded: Int):
+        """Creates a new Bitmap that supports at least `length_unpadded` elements.
+
+        Args:
+            length_unpadded: The number of elements the Bitmap should support.
+                Buffers are typically padded to 32, 64, or 128 bytes but it
+                depends on the architecture.
+        """
         var num_bytes = (length_unpadded + 7) // 8
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
 
@@ -48,10 +55,11 @@ struct Bitmap(StringableRaising):
             self._unsafe_setitem(i, bools[i])
 
     fn _unsafe_setitem(self, index: Int, value: Bool):
-        """Doesn't check if index is out of bounds."""
+        """Doesn't check if index is out of bounds.
+        Only works if memory is true, doesn't work if memory is 1 and value is False"""
         var byte_index = index // 8
         var bitmask = UInt8(value.__int__()) << (index % 8)
-        var new_byte = self._buffer.load(byte_index) | bitmask
+        var new_byte = self._buffer.load(byte_index) | bitmask  # only works if memory is 0
         self._buffer.store(byte_index, new_byte)
 
     @always_inline
