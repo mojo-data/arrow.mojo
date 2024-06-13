@@ -7,9 +7,9 @@ struct BinaryBuffer:
     var length: Int
     var mem_used: Int
 
-    fn __init__(inout self, length: Int):
-        self.length = length
-        self.mem_used = get_num_bytes_with_padding(length)
+    fn __init__(inout self, length_unpadded: Int):
+        self.length = length_unpadded
+        self.mem_used = get_num_bytes_with_padding(length_unpadded)
         self._buffer = Pointer[UInt8].alloc(self.mem_used, alignment=ALIGNMENT)
         memset_zero(self._buffer, self.mem_used)
 

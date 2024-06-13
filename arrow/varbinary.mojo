@@ -1,13 +1,14 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 from arrow.arrow import Bitmap
+from arrow.buffer import BinaryBuffer, OffsetBuffer
 
 
 struct ArrowStringVector:
     var length: Int
     var null_count: Int
     var validity: Bitmap
-    var offsets: List[Int]
-    var value_buffer: Pointer[UInt8]
+    var offsets: OffsetBuffer
+    var value_buffer: BinaryBuffer
     var mem_used: Int
 
     fn __init__(inout self, values: List[String]):
@@ -18,26 +19,22 @@ struct ArrowStringVector:
         var buffer_size = 0
         for i in range(len(values)):
             buffer_size += values[i]._buffer.size
-        var num_bytes_with_padding = get_num_bytes_with_padding(buffer_size)
-        self.value_buffer = Pointer[UInt8].alloc(
-            num_bytes_with_padding, alignment=ALIGNMENT
-        )
-        self.mem_used = num_bytes_with_padding
+        self.value_buffer = BinaryBuffer(buffer_size)
 
         offset_list.append(0)
         var offset_cursor = 0
         for i in range(len(values)):
             validity_list.append(True)
             var bytes = values[i].as_bytes()
-            for j in range(len(bytes)):
-                self.value_buffer.store(offset_cursor, bytes[j])
-                offset_cursor += 1
+            self.value_buffer._unsafe_set_sequence(offset_cursor, bytes)
+            offset_cursor += len(bytes)
             offset_list.append(offset_cursor)
 
         self.length = len(values)
         self.null_count = 0
         self.validity = Bitmap(validity_list)
-        self.offsets = offset_list
+        self.offsets = OffsetBuffer(offset_list)
+        self.mem_used = self.value_buffer.mem_used + self.offsets.mem_used
 
     fn __getitem__(self, index: Int) raises -> String:
         if index < 0 or index >= self.length:
@@ -45,14 +42,9 @@ struct ArrowStringVector:
         var start = self.offsets[index]
         var length = self.offsets[index + 1] - start
 
-        var bytes = List[UInt8](capacity=length + 1)
-        for i in range(length):
-            bytes.append(self.value_buffer.load(start + i))
-        bytes.append(0)  # null-terminate the string
+        var bytes = self.value_buffer._unsafe_get_sequence(start, length)
+        bytes.extend(List(UInt8(0))) # TODO: null terminate string without copying
         return String(bytes)
 
     fn __len__(self) -> Int:
         return self.length
-
-    fn __del__(owned self):
-        self.value_buffer.free()
