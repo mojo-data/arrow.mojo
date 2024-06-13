@@ -43,7 +43,9 @@ struct ArrowStringVector:
         var length = self.offsets[index + 1] - start
 
         var bytes = self.value_buffer._unsafe_get_sequence(start, length)
-        bytes.extend(List(UInt8(0))) # TODO: null terminate string without copying
+        bytes.extend(
+            List(UInt8(0))
+        )  # TODO: null terminate string without copying
         return String(bytes)
 
     fn __len__(self) -> Int:

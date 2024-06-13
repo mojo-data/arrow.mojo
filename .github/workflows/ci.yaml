@@ -22,13 +22,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Mojo compiler
+      - name: Install mojo
         run: |
           curl -s https://get.modular.com | sh -
           modular install mojo
           echo "/home/runner/.modular/pkg/packages.modular.com_mojo/bin:$PATH" >> $GITHUB_PATH
 
-      - name: run tests
+      - name: checks
         run: |
-          pwd
+          pip install pre-commit
+          pre-commit run -a
+
+      - name: tests
+        run: |
           make test
