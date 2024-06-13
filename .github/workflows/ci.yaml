@@ -31,4 +31,4 @@ jobs:
       - name: run tests
         run: |
           pwd
-          make setup
+          make test
