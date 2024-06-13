@@ -17,7 +17,6 @@ jobs:
         shell: bash
     env:
       MODULAR_HOME: "/home/runner/.modular"
-      PATH: "/home/runner/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
 
     steps:
       - name: Checkout repo
@@ -27,6 +26,7 @@ jobs:
         run: |
           curl -s https://get.modular.com | sh -
           modular install mojo
+          echo "/home/runner/.modular/pkg/packages.modular.com_mojo/bin:$PATH" >> $GITHUB_PATH
 
       - name: run tests
         run: |
