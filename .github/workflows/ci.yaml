@@ -1,0 +1,38 @@
+name: Run Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      MODULAR_HOME: "/home/runner/.modular"
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Install mojo
+        run: |
+          curl -s https://get.modular.com | sh -
+          modular install mojo
+          echo "/home/runner/.modular/pkg/packages.modular.com_mojo/bin:$PATH" >> $GITHUB_PATH
+
+      - name: checks
+        run: |
+          pip install -q pre-commit
+          pre-commit run -a
+
+      - name: tests
+        run: |
+          mojo test -I .
