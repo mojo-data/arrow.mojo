@@ -16,7 +16,8 @@ jobs:
       run:
         shell: bash
     env:
-      DEBIAN_FRONTEND: noninteractive
+      MODULAR_HOME: "/home/runner/.modular"
+      PATH: "/home/runner/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
 
     steps:
       - name: Checkout repo
@@ -30,4 +31,4 @@ jobs:
       - name: run tests
         run: |
           pwd
-          make test
+          make setup
