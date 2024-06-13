@@ -1,6 +1,6 @@
 .PHONY: test
 test: fmt
-	@poetry run mojo test -I .
+	mojo test -I .
 
 .PHONY: build
 build: fmt
