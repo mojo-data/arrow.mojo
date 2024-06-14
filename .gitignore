@@ -3,3 +3,4 @@ dist/
 install_id
 **/.DS_Store
 scratch/
+.vscode/
