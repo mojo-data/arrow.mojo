@@ -5,11 +5,6 @@ from arrow.buffer.bitmap import Bitmap
 from arrow.buffer.offset import OffsetBuffer
 
 
-struct ArrowBoolVector:
-    var validity: Bitmap
-    var buffer: Bitmap
-
-
 struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
     # TODO: support null values
     var length: Int
