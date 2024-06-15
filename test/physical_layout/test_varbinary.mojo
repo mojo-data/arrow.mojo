@@ -1,5 +1,5 @@
 from testing import assert_equal
-from arrow.varbinary import ArrowStringVector
+from arrow.physical_layout.varbinary import ArrowStringVector
 
 
 def test_string_vector():
