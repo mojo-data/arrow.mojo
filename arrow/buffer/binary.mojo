@@ -3,14 +3,15 @@ from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 
 @value
 struct BinaryBuffer:
-    var _buffer: Pointer[UInt8]
+    alias _ptr_type = DTypePointer[DType.uint8]
+    var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
 
     fn __init__(inout self, length_unpadded: Int):
         self.length = length_unpadded
         self.mem_used = get_num_bytes_with_padding(length_unpadded)
-        self._buffer = Pointer[UInt8].alloc(self.mem_used, alignment=ALIGNMENT)
+        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
         memset_zero(self._buffer, self.mem_used)
 
     fn __init__(inout self, values: List[UInt8]):
@@ -19,7 +20,7 @@ struct BinaryBuffer:
 
     @always_inline
     fn _unsafe_setitem(self, index: Int, value: UInt8):
-        self._buffer.store(index, value)
+        self._buffer[index] = value
 
     fn __setitem__(self, index: Int, value: UInt8) raises:
         if index < 0 or index >= self.length:
@@ -28,7 +29,7 @@ struct BinaryBuffer:
 
     @always_inline
     fn _unsafe_getitem(self, index: Int) -> UInt8:
-        return self._buffer.load(index)
+        return self._buffer[index]
 
     fn __getitem__(self, index: Int) raises -> UInt8:
         if index < 0 or index >= self.length:
@@ -68,9 +69,9 @@ struct BinaryBuffer:
     fn __copyinit__(inout self, existing: BinaryBuffer):
         self.length = existing.length
         self.mem_used = existing.mem_used
-        self._buffer = Pointer[UInt8].alloc(self.mem_used, alignment=ALIGNMENT)
+        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
         for i in range(self.mem_used):
-            self._buffer.store(i, existing._buffer.load(i))
+            self._buffer[i] = existing._buffer[i]
 
     fn __del__(owned self):
         self._buffer.free()
