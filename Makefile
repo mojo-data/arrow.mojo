@@ -17,6 +17,7 @@ fmt:
 
 .PHONY: setup
 setup:
+	pip install -r requirements.txt
 	@pre-commit install
 	@echo "\n***\nInstalling python dependencies\n***\n"
 	POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
