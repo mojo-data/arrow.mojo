@@ -24,7 +24,8 @@ struct Bitmap(StringableRaising):
     ```
     """
 
-    var _buffer: Pointer[UInt8]
+    alias _ptr_type = DTypePointer[DType.uint8]
+    var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
     # TODO maybe buffers shouldn't have length and mem_used, just size.
@@ -41,7 +42,7 @@ struct Bitmap(StringableRaising):
         var num_bytes = (length_unpadded + 7) // 8
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
 
-        self._buffer = Pointer[UInt8].alloc(
+        self._buffer = Self._ptr_type.alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
         memset_zero(self._buffer, num_bytes_with_padding)
@@ -60,10 +61,10 @@ struct Bitmap(StringableRaising):
         """
         var byte_index = index // 8
         var bitmask = UInt8(value.__int__()) << (index % 8)
-        var new_byte = self._buffer.load(
+        var new_byte = self._buffer[
             byte_index
-        ) | bitmask  # only works if memory is 0
-        self._buffer.store(byte_index, new_byte)
+        ] | bitmask  # only works if memory is 0
+        self._buffer[byte_index] = new_byte
 
     @always_inline
     fn _unsafe_getitem(self, index: Int) -> Bool:
@@ -75,7 +76,7 @@ struct Bitmap(StringableRaising):
         """
         var byte_index = index // 8
         var bitmask: UInt8 = 1 << (index % 8)
-        return ((self._buffer.load(byte_index) & bitmask)).__bool__()
+        return ((self._buffer[byte_index] & bitmask)).__bool__()
 
     fn __getitem__(self, index: Int) raises -> Bool:
         if index < 0 or index >= self.length:
@@ -94,11 +95,11 @@ struct Bitmap(StringableRaising):
         self.mem_used = existing.mem_used
 
     fn __copyinit__(inout self, existing: Bitmap):
-        self._buffer = Pointer[UInt8].alloc(
+        self._buffer = Self._ptr_type.alloc(
             existing.mem_used, alignment=ALIGNMENT
         )
         for i in range(existing.mem_used):
-            self._buffer.store(i, existing._buffer.load(i))
+            self._buffer[i] = existing._buffer[i]
         self.length = existing.length
         self.mem_used = existing.mem_used
 
