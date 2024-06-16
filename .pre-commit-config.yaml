@@ -5,4 +5,4 @@ repos:
         name: Run format
         entry: mojo format
         language: system
-        files: \.(mojo)$
+        files: \.mojo$

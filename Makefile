@@ -17,8 +17,10 @@ fmt:
 
 .PHONY: setup
 setup:
-	@pre-commit install
+	@uv venv
 	@echo "\n***\nInstalling python dependencies\n***\n"
-	POETRY_VIRTUALENVS_IN_PROJECT=true poetry install
+	@uv pip install -r requirements.txt
+	@echo "\n***\nInstalling pre-commit hooks\n***\n"
+	@./.venv/bin/pre-commit install
 	@echo "\n***\nRunning tests (they should all pass)\n***\n"
-	poetry run mojo test -I .
+	@source .venv/bin/activate && mojo test -I .

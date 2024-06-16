@@ -7,14 +7,11 @@ This repo is very much a work in progress. The goal is to provide a way to use A
 ## Dev Setup
 
 Prerequisites
-- pyenv
-- poetry
-- Python installed via pyenv
+- Python 3.11 (recommended via pyenv, but not required)
+- `uv` for python package management https://github.com/astral-sh/uv
+- Mojo
 
 ```bash
-# Install the right python version
-pyenv install $(cat .python-version)
-
 # Install python deps
 make setup
 ```
