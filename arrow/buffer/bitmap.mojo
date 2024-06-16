@@ -28,7 +28,9 @@ struct Bitmap(StringableRaising):
     alias _ptr_type = DTypePointer[DType.uint8]
     var _buffer: Self._ptr_type
     var length: Int
+    """The length of the Buffer."""
     var mem_used: Int
+    """The amount of bytes used."""
     # TODO maybe buffers shouldn't have length and mem_used, just size.
     # The layouts that use the buffers can keep track of their length.
 
@@ -52,6 +54,12 @@ struct Bitmap(StringableRaising):
         self.mem_used = num_bytes_with_padding
 
     fn __init__(inout self, bools: List[Bool]):
+        """Construct a Bitmap from a List[Bool].
+
+        Args:
+            bools: The values.
+        """
+
         self = Self(len(bools))
 
         for i in range(len(bools)):
@@ -62,6 +70,7 @@ struct Bitmap(StringableRaising):
         Only works if memory is true, doesn't work if memory is 1 and
         value is False.
         """
+
         var byte_index = index // 8
         var bitmask = UInt8(value.__int__()) << (index % 8)
         var new_byte = self._buffer[
@@ -77,19 +86,40 @@ struct Bitmap(StringableRaising):
 
         `is_valid[j] -> bitmap[j / 8] & (1 << (j % 8))`
         """
+
         var byte_index = index // 8
         var bitmask: UInt8 = 1 << (index % 8)
         return ((self._buffer[byte_index] & bitmask)).__bool__()
 
     fn __getitem__(self, index: Int) raises -> Bool:
+        """Get an item at the given index.
+
+        Args:
+            index: The index.
+
+        Returns:
+            The value.
+
+        Raises:
+            - index out of range for Bitmap.
+        """
+
         if index < 0 or index >= self.length:
             raise Error("index out of range for Bitmap")
         return self._unsafe_getitem(index)
 
     fn __len__(self) -> Int:
+        """Get the length.
+
+        Returns:
+            The length.
+        """
+
         return self.length
 
     fn __del__(owned self):
+        """Delete the `Bitmap`."""
+
         self._buffer.free()
 
     fn __moveinit__(inout self, owned existing: Bitmap):

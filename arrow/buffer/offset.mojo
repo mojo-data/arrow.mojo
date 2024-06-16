@@ -13,9 +13,17 @@ struct OffsetBuffer:
     var _buffer: Self._ptr_type
     var _buffer_int_view: DTypePointer[DType.index]
     var length: Int
+    """The length of the Buffer."""
     var mem_used: Int
+    """The amount of bytes used."""
 
     fn __init__(inout self, length: Int):
+        """Construct an OffsetBuffer.
+
+        Args:
+            length: The length.
+        """
+
         self.length = length
         var byte_width = sizeof[Int]()
         var num_bytes = self.length * byte_width
@@ -25,6 +33,12 @@ struct OffsetBuffer:
         self._buffer_int_view = self._buffer.bitcast[DType.index]()
 
     fn __init__(inout self, values: List[Int]):
+        """Construct an OffsetBuffer from a List.
+
+        Args:
+            values: The List.
+        """
+
         self = Self(len(values))
         for i in range(len(values)):
             self._unsafe_setitem(i, values[i])
@@ -34,6 +48,18 @@ struct OffsetBuffer:
         return int(self._buffer_int_view[index])
 
     fn __getitem__(self, index: Int) raises -> Int:
+        """Get an item at the given index.
+
+        Args:
+            index: The index.
+
+        Returns:
+            The value.
+
+        Raises:
+            - index out of range for OffsetBuffer.
+        """
+
         if index < 0 or index >= self.length:
             raise Error("index out of range for OffsetBuffer")
         return self._unsafe_getitem(index)
@@ -43,11 +69,27 @@ struct OffsetBuffer:
         self._buffer_int_view[index] = value
 
     fn __setitem__(self, index: Int, value: Int) raises:
+        """Set an item at the given index.
+
+        Args:
+            index: The index.
+            value: The value.
+
+        Raises:
+            - index out of range for OffsetBuffer.
+        """
+
         if index < 0 or index >= self.length:
             raise Error("index out of range for OffsetBuffer")
         self._unsafe_setitem(index, value)
 
     fn __len__(self) -> Int:
+        """Get the length.
+
+        Returns:
+            The length.
+        """
+
         return self.length
 
     fn __moveinit__(inout self, owned existing: OffsetBuffer):
@@ -65,4 +107,6 @@ struct OffsetBuffer:
         self._buffer_int_view = self._buffer.bitcast[DType.index]()
 
     fn __del__(owned self):
+        """Delete the OffsetBuffer."""
+
         self._buffer.free()

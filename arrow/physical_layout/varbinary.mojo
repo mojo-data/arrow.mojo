@@ -54,13 +54,29 @@ struct ArrowStringVector:
     """
 
     var length: Int
+    """The length of the vector."""
     var null_count: Int
+    """The amount of nulls in the vector."""
     var validity: Bitmap
+    """Whether any array slot is valid (non-null). A 1 (set bit) for index j
+    indicates that the value is not null, while a 0 (bit not set) indicates that
+    it is null.
+    """
     var offsets: OffsetBuffer
+    """The offsets buffer which encodes the start position of each slot in the
+    data buffer.
+    """
     var value_buffer: BinaryBuffer
+    """A Buffer of UInt8 bytes."""
     var mem_used: Int
+    """The amount of bytes used."""
 
     fn __init__(inout self, values: List[String]):
+        """Construct an `ArrowStringVector` from a List[String].
+
+        Args:
+            values: The List.
+        """
         var validity_list = List[Bool](capacity=len(values))
         var offset_list = List[Int](capacity=len(values) + 1)
 
@@ -86,6 +102,18 @@ struct ArrowStringVector:
         self.mem_used = self.value_buffer.mem_used + self.offsets.mem_used
 
     fn __getitem__(self, index: Int) raises -> String:
+        """Get an item at the given index.
+
+        Args:
+            index: The index.
+
+        Returns:
+            The value.
+
+        Raises:
+            - index out of range for ArrowFixedWidthVector.
+        """
+
         if index < 0 or index >= self.length:
             raise Error("index out of range for ArrowStringVector")
         var start = self.offsets[index]
@@ -98,4 +126,10 @@ struct ArrowStringVector:
         return String(bytes)
 
     fn __len__(self) -> Int:
+        """Get the length.
+
+        Returns:
+            The length.
+        """
+
         return self.length

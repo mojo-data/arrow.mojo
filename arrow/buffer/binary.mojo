@@ -8,15 +8,29 @@ struct BinaryBuffer:
     alias _ptr_type = DTypePointer[DType.uint8]
     var _buffer: Self._ptr_type
     var length: Int
+    """The length of the Buffer."""
     var mem_used: Int
+    """The amount of bytes used."""
 
     fn __init__(inout self, length_unpadded: Int):
+        """Construct a BinaryBuffer with a length.
+
+        Args:
+            length_unpadded: The unpadded length.
+        """
+
         self.length = length_unpadded
         self.mem_used = get_num_bytes_with_padding(length_unpadded)
         self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
         memset_zero(self._buffer, self.mem_used)
 
     fn __init__(inout self, values: List[UInt8]):
+        """Construct a BinaryBuffer from a List[UInt8].
+
+        Args:
+            values: The List.
+        """
+
         self = Self(len(values))
         self._unsafe_set_sequence(0, values)
 
@@ -34,6 +48,18 @@ struct BinaryBuffer:
         return self._buffer[index]
 
     fn __getitem__(self, index: Int) raises -> UInt8:
+        """Get an item at the given index.
+
+        Args:
+            index: The index.
+
+        Returns:
+            The value.
+
+        Raises:
+            - index out of range for BinaryBuffer.
+        """
+
         if index < 0 or index >= self.length:
             raise Error("index out of range for BinaryBuffer")
         return self._unsafe_getitem(index)
@@ -59,6 +85,12 @@ struct BinaryBuffer:
         return self._unsafe_get_sequence(start, length)
 
     fn __len__(self) -> Int:
+        """Get the length.
+
+        Returns:
+            The length.
+        """
+
         return self.length
 
     # Lifecycle methods
@@ -76,4 +108,6 @@ struct BinaryBuffer:
             self._buffer[i] = existing._buffer[i]
 
     fn __del__(owned self):
+        """Delete the BinaryBuffer."""
+
         self._buffer.free()

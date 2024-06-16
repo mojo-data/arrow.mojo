@@ -45,14 +45,28 @@ struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
 
     # TODO: support null values
     var length: Int
+    """The length of the vector."""
     var null_count: Int
+    """The amount of nulls in the vector."""
     var validity: Bitmap
+    """Whether any array slot is valid (non-null). A 1 (set bit) for index j
+    indicates that the value is not null, while a 0 (bit not set) indicates that
+    it is null.
+    """
     var value: Pointer[UInt8]
+    """The values of the vector as UInt8 bytes."""
     var view: Pointer[T]
+    """The values of the vector as its native type."""
 
     var mem_use: Int
 
     fn __init__(inout self, values: List[T]):
+        """Construct an `ArrowFixedWidthVector` from a List.
+
+        Args:
+            values: The List.
+        """
+
         var byte_width = sizeof[T]()
         var num_bytes = len(values) * byte_width
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
@@ -77,14 +91,34 @@ struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
         self.mem_use = num_bytes_with_padding
 
     fn __getitem__(self, index: Int) raises -> T:
+        """Get an item at the given index.
+
+        Args:
+            index: The index.
+
+        Returns:
+            The value.
+
+        Raises:
+            - index out of range for ArrowFixedWidthVector.
+        """
+
         if index < 0 or index >= self.length:
             raise Error("index out of range for ArrowFixedWidthVector")
         return self.view.load(index)
 
     fn __len__(self) -> Int:
+        """Get the length.
+
+        Returns:
+            The length.
+        """
+
         return self.length
 
     fn __del__(owned self):
+        """Delete the `ArrowFixedWidthVector`."""
+
         self.value.free()
 
 
