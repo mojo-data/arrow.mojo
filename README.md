@@ -16,6 +16,10 @@ Prerequisites
 - Python 3.11 (recommended via pyenv, but not required)
 - [`uv`](https://github.com/astral-sh/uv) for python package management. Needed for `make setup` to work but optional. You can also use `pip install -r requirements.txt` instead.
 
+If you would like to manually create your python virtual env, use this command
+```
+python3 -m venv .venv
+```
 
 The makefile contains some helpful commands:
 - `make setup` - Install python dependencies & setup .venv
