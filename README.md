@@ -6,15 +6,15 @@ This repo is very much a work in progress. The goal is to provide a way to use A
 
 ## Dev Setup
 
+If you have all the prerequisites, you should be able to just run 
+```bash
+make setup
+```
+
 Prerequisites
 - Python 3.11 (recommended via pyenv, but not required)
 - [`uv`](https://github.com/astral-sh/uv) for python package management
 - [Mojo](https://www.modular.com/max/mojo)
-
-```bash
-# Install python deps
-make setup
-```
 
 The makefile contains some helpful commands:
 - `make setup` - Install python dependencies & setup .venv
