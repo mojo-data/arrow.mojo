@@ -4,6 +4,55 @@ from arrow.buffer import BinaryBuffer, OffsetBuffer
 
 
 struct ArrowStringVector:
+    """Each value in this layout consists of 0 or more bytes. While primitive
+    arrays have a single values buffer, variable-size binary have an offsets
+    buffer and data buffer.
+
+    For example, the position and length of slot j is computed as:
+    ```
+    slot_position = offsets[j]
+    slot_length = offsets[j + 1] - offsets[j]  // (for 0 <= j < length)
+    ```
+    It should be noted that a null value may have a positive slot length. That
+    is, a null value may occupy a non-empty memory space in the data buffer.
+    When this is true, the content of the corresponding memory space is
+    undefined.
+
+    Offsets must be monotonically increasing, that is offsets[j+1] >= offsets[j]
+    for 0 <= j < length, even for null slots. This property ensures the location
+    for all values is valid and well defined.
+
+    Generally the first slot in the offsets array is 0, and the last slot is the
+    length of the values array. When serializing this layout, we recommend
+    normalizing the offsets to start at 0.
+
+    Example Layout: ``VarBinary``
+    ```
+    ['joe', null, null, 'mark']
+    ```
+
+    will be represented as follows:
+
+    * Length: 4, Null count: 2
+    * Validity bitmap buffer:
+
+    | Byte 0 (validity bitmap) | Bytes 1-63            |
+    |--------------------------|-----------------------|
+    | 00001001                 | 0 (padding)           |
+
+    * Offsets buffer:
+
+    | Bytes 0-19     | Bytes 20-63           |
+    |----------------|-----------------------|
+    | 0, 3, 3, 3, 7  | unspecified (padding) |
+
+    * Value buffer:
+
+    | Bytes 0-6      | Bytes 7-63            |
+    |----------------|-----------------------|
+    | joemark        | unspecified (padding) |
+    """
+
     var length: Int
     var null_count: Int
     var validity: Bitmap

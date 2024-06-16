@@ -2,6 +2,13 @@ from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 
 
 struct OffsetBuffer:
+    """The offsets buffer contains length + 1 signed integers (either 32-bit or
+    64-bit, depending on the logical type), which encode the start position of
+    each slot in the data buffer. The length of the value in each slot is
+    computed using the difference between the offset at that slot's index and
+    the subsequent offset.
+    """
+
     alias _ptr_type = DTypePointer[DType.uint8]
     var _buffer: Self._ptr_type
     var _buffer_int_view: DTypePointer[DType.index]

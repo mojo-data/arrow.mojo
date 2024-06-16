@@ -3,6 +3,8 @@ from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 
 @value
 struct BinaryBuffer:
+    """A Buffer of UInt8 bytes."""
+
     alias _ptr_type = DTypePointer[DType.uint8]
     var _buffer: Self._ptr_type
     var length: Int
