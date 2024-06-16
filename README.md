@@ -8,8 +8,8 @@ This repo is very much a work in progress. The goal is to provide a way to use A
 
 Prerequisites
 - Python 3.11 (recommended via pyenv, but not required)
-- `uv` for python package management https://github.com/astral-sh/uv
-- Mojo
+- [`uv`](https://github.com/astral-sh/uv) for python package management
+- [Mojo](https://www.modular.com/max/mojo)
 
 ```bash
 # Install python deps
@@ -17,15 +17,21 @@ make setup
 ```
 
 The makefile contains some helpful commands:
-- `make setup` - Install python dependencies
+- `make setup` - Install python dependencies & setup .venv
 - `make test` - Run tests
 - `make fmt` - Run formatter
 - `make build` - Build the package
 - `make clean` - Clean up build artifacts
 
-However, for `make` commands to work `~/.zprofile` or `~/.bash_profile` must set MODULAR_HOME and modify the PATH to include `nightly/mojo`'s `bin` directory. For example:
+However, for `make` commands to work 
+`MODULAR_HOME` and `PATH` must be configured in `~/.zprofile` or `~/.bash_profile` in addition to `~/.zshrc` or `~/.bashrc`.
 
 ```bash
 export MODULAR_HOME="$HOME/.modular"
+
+# Pick one of the following, don't use both
+# Option A: Nightly Mojo
 export PATH="$HOME/.modular/pkg/packages.modular.com_nightly_mojo/bin:$PATH"
+# Option B: Stable Mojo
+export PATH="$HOME/.modular/pkg/packages.modular.com_mojo/bin:$PATH"
 ```
