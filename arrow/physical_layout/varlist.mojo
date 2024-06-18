@@ -48,17 +48,13 @@ struct VariableSizedList[type: DType]:
         if index < 0 or index >= self.length:
             # TODO: Sprintf the index into the error
             raise Error("index out of range for ArrowVariableSizedList")
-        return List[type](1,2,3)
-    #     var start = self.offsets[index]
-    #     var length = self.offsets[index + 1] - start
-
-    #     var bytes = self.value_buffer._unsafe_get_sequence(
-    #         rebind[Int](start), rebind[Int](length)
-    #     )
-    #     bytes.extend(
-    #         List(UInt8(0))
-    #     )  # TODO: null terminate string without copying
-    #     return String(bytes)
+        var ret = List[Self.element_type]() 
+        
+        var start: Int = int(self.offsets[index])
+        var length: Int = self.offsets[index + i] - start
+        for i in range(length):
+            ret.append(self.value_buffer[start + i])
+        return ret
 
     fn __len__(self) -> Int:
         return self.length
