@@ -15,7 +15,7 @@ struct VariableSizedList[type: DType]:
 
     var mem_used: Int
 
-    fn __init__(inout self, values: List[List[type]]) raises:
+    fn __init__(inout self, values: List[List[Self.element_type]]) raises:
         self.length = len(values)
     
 
@@ -29,7 +29,7 @@ struct VariableSizedList[type: DType]:
         self.value_buffer = DTypeBuffer[type](buffer_size)
 
         offset_list.append(0)
-        var offset_cursor = 0
+        var offset_cursor: Int = 0
         for i in range(len(values)):
             # TODO: support nulls
             validity_list.append(True)
@@ -44,7 +44,7 @@ struct VariableSizedList[type: DType]:
         self.offsets = OffsetBuffer64(offset_list)
         self.mem_used = self.value_buffer.mem_used + self.offsets.mem_used
 
-    fn __getitem__(self, index: Int) raises -> List[type]:
+    fn __getitem__(self, index: Int) raises -> List[Self.element_type]:
         if index < 0 or index >= self.length:
             # TODO: Sprintf the index into the error
             raise Error("index out of range for ArrowVariableSizedList")
