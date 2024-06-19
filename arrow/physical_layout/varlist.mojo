@@ -6,7 +6,7 @@ from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
 struct VariableSizedList[type: DType]:
     alias element_type = Scalar[type]
     alias element_byte_width = sizeof[Self.element_type]()
-    
+
     var length: Int
     var null_count: Int
     var validity: Bitmap
@@ -17,7 +17,6 @@ struct VariableSizedList[type: DType]:
 
     fn __init__(inout self, values: List[List[Self.element_type]]) raises:
         self.length = len(values)
-    
 
         var validity_list = List[Bool](capacity=len(values))
         var offset_list = List[Int](capacity=len(values) + 1)
@@ -48,10 +47,10 @@ struct VariableSizedList[type: DType]:
         if index < 0 or index >= self.length:
             # TODO: Sprintf the index into the error
             raise Error("index out of range for ArrowVariableSizedList")
-        var ret = List[Self.element_type]() 
-        
+        var ret = List[Self.element_type]()
+
         var start: Int = int(self.offsets[index])
-        var length: Int = self.offsets[index + i] - start
+        var length: Int = int(self.offsets[index + 1] - start)
         for i in range(length):
             ret.append(self.value_buffer[start + i])
         return ret
