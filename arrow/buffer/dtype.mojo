@@ -33,10 +33,10 @@ struct DTypeBuffer[type: DType]:
         return self._unsafe_getitem(index)
 
     @always_inline
-    fn _unsafe_setitem(self, index: Int, value: Int):
+    fn _unsafe_setitem(self, index: Int, value: Self.element_type):
         self._buffer[index] = value
 
-    fn __setitem__(self, index: Int, value: Int) raises:
+    fn __setitem__(self, index: Int, value: Self.element_type) raises:
         if index < 0 or index >= self.length:
             raise Error("index out of range for DTypeBuffer")
         self._unsafe_setitem(index, value)
