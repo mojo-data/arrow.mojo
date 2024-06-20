@@ -2,7 +2,7 @@ from memory.unsafe import Pointer
 from memory import memset_zero
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 from arrow.buffer.bitmap import Bitmap
-from arrow.buffer.offset import OffsetBuffer
+from arrow.buffer.offset import OffsetBuffer64
 
 
 struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
@@ -131,12 +131,12 @@ struct ArrowIntVector:
     var length: Int
     var null_count: Int
     var validity: Bitmap
-    var value_buffer: OffsetBuffer
+    var value_buffer: OffsetBuffer64
     var mem_used: Int
 
     fn __init__(inout self, values: List[Int]):
         self.length = len(values)
-        self.value_buffer = OffsetBuffer(values)
+        self.value_buffer = OffsetBuffer64(values)
 
         var validity_list = List[Bool](capacity=len(values))
         for i in range(values.size):
@@ -149,7 +149,7 @@ struct ArrowIntVector:
 
         self.mem_used = self.value_buffer.mem_used + self.validity.mem_used
 
-    fn __getitem__(self, index: Int) raises -> Int:
+    fn __getitem__(self, index: Int) raises -> Int64:
         return self.value_buffer[index]
 
     fn __len__(self) -> Int:

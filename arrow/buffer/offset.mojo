@@ -1,112 +1,15 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
+from arrow.buffer.dtype import DTypeBuffer
 
-
-struct OffsetBuffer:
-    """The offsets buffer contains length + 1 signed integers (either 32-bit or
-    64-bit, depending on the logical type), which encode the start position of
-    each slot in the data buffer. The length of the value in each slot is
-    computed using the difference between the offset at that slot's index and
-    the subsequent offset.
-    """
-
-    alias _ptr_type = DTypePointer[DType.uint8]
-    var _buffer: Self._ptr_type
-    var _buffer_int_view: DTypePointer[DType.index]
-    var length: Int
-    """The length of the Buffer."""
-    var mem_used: Int
-    """The amount of bytes used."""
-
-    fn __init__(inout self, length: Int):
-        """Construct an OffsetBuffer.
-
-        Args:
-            length: The length.
-        """
-
-        self.length = length
-        var byte_width = sizeof[Int]()
-        var num_bytes = self.length * byte_width
-        self.mem_used = get_num_bytes_with_padding(num_bytes)
-        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
-        memset_zero(self._buffer, self.mem_used)
-        self._buffer_int_view = self._buffer.bitcast[DType.index]()
-
-    fn __init__(inout self, values: List[Int]):
-        """Construct an OffsetBuffer from a List.
-
-        Args:
-            values: The List.
-        """
-
-        self = Self(len(values))
-        for i in range(len(values)):
-            self._unsafe_setitem(i, values[i])
-
-    @always_inline
-    fn _unsafe_getitem(self, index: Int) -> Int:
-        return int(self._buffer_int_view[index])
-
-    fn __getitem__(self, index: Int) raises -> Int:
-        """Get an item at the given index.
-
-        Args:
-            index: The index.
-
-        Returns:
-            The value.
-
-        Raises:
-            - index out of range for OffsetBuffer.
-        """
-
-        if index < 0 or index >= self.length:
-            raise Error("index out of range for OffsetBuffer")
-        return self._unsafe_getitem(index)
-
-    @always_inline
-    fn _unsafe_setitem(self, index: Int, value: Int):
-        self._buffer_int_view[index] = value
-
-    fn __setitem__(self, index: Int, value: Int) raises:
-        """Set an item at the given index.
-
-        Args:
-            index: The index.
-            value: The value.
-
-        Raises:
-            - index out of range for OffsetBuffer.
-        """
-
-        if index < 0 or index >= self.length:
-            raise Error("index out of range for OffsetBuffer")
-        self._unsafe_setitem(index, value)
-
-    fn __len__(self) -> Int:
-        """Get the length.
-
-        Returns:
-            The length.
-        """
-
-        return self.length
-
-    fn __moveinit__(inout self, owned existing: OffsetBuffer):
-        self._buffer = existing._buffer
-        self._buffer_int_view = existing._buffer_int_view
-        self.length = existing.length
-        self.mem_used = existing.mem_used
-
-    fn __copyinit__(inout self, existing: OffsetBuffer):
-        self.length = existing.length
-        self.mem_used = existing.mem_used
-        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
-        for i in range(self.mem_used):
-            self._buffer[i] = existing._buffer[i]
-        self._buffer_int_view = self._buffer.bitcast[DType.index]()
-
-    fn __del__(owned self):
-        """Delete the OffsetBuffer."""
-
-        self._buffer.free()
+alias OffsetBuffer32 = DTypeBuffer[DType.int32]
+"""The offsets buffer contains length + 1 signed integers (32-bit),
+which encode the start position of each slot in the data buffer. The length of
+the value in each slot is computed using the difference between the offset at
+that slot's index and the subsequent offset.
+"""
+alias OffsetBuffer64 = DTypeBuffer[DType.int64]
+"""The offsets buffer contains length + 1 signed integers (64-bit), which
+encode the start position of each slot in the data buffer. The length of the
+value in each slot is computed using the difference between the offset at that
+slot's index and the subsequent offset.
+"""

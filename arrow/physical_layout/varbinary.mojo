@@ -1,6 +1,6 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 from arrow.arrow import Bitmap
-from arrow.buffer import BinaryBuffer, OffsetBuffer
+from arrow.buffer import BinaryBuffer, OffsetBuffer32, OffsetBuffer64
 
 
 struct ArrowStringVector:
@@ -62,7 +62,7 @@ struct ArrowStringVector:
     indicates that the value is not null, while a 0 (bit not set) indicates that
     it is null.
     """
-    var offsets: OffsetBuffer
+    var offsets: OffsetBuffer64
     """The offsets buffer which encodes the start position of each slot in the
     data buffer.
     """
@@ -98,7 +98,7 @@ struct ArrowStringVector:
         self.length = len(values)
         self.null_count = 0
         self.validity = Bitmap(validity_list)
-        self.offsets = OffsetBuffer(offset_list)
+        self.offsets = OffsetBuffer64(offset_list)
         self.mem_used = self.value_buffer.mem_used + self.offsets.mem_used
 
     fn __getitem__(self, index: Int) raises -> String:
@@ -119,7 +119,9 @@ struct ArrowStringVector:
         var start = self.offsets[index]
         var length = self.offsets[index + 1] - start
 
-        var bytes = self.value_buffer._unsafe_get_sequence(start, length)
+        var bytes = self.value_buffer._unsafe_get_sequence(
+            rebind[Int](start), rebind[Int](length)
+        )
         bytes.extend(
             List(UInt8(0))
         )  # TODO: null terminate string without copying
