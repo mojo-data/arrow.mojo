@@ -5,21 +5,21 @@ from arrow.buffer.bitmap import Bitmap
 from arrow.buffer.offset import OffsetBuffer64
 
 
-struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
-    # TODO: support null values
+struct ArrowFixedWidthVector[T: DType]:
     var length: Int
     var null_count: Int
     var validity: Bitmap
-    var value: Pointer[UInt8]
-    var view: Pointer[T]
+    alias _ptr_type = DTypePointer[DType.uint8]
+    var value: Self._ptr_type
+    var view: DTypePointer[T]
 
     var mem_use: Int
 
-    fn __init__(inout self, values: List[T]):
+    fn __init__(inout self, values: List[Scalar[T]]):
         var byte_width = sizeof[T]()
         var num_bytes = len(values) * byte_width
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
-        var ui8_ptr = Pointer[UInt8].alloc(
+        var ui8_ptr = Self._ptr_type.alloc(
             num_bytes_with_padding, alignment=ALIGNMENT
         )
         memset_zero(ui8_ptr, num_bytes_with_padding)
@@ -30,7 +30,7 @@ struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
         for i in range(values.size):
             validity_list.append(True)
             var val = values[i]
-            ptr.store(i, val)
+            ptr[i] = val
 
         self.value = ui8_ptr
         self.validity = Bitmap(validity_list)
@@ -39,10 +39,38 @@ struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
         self.length = len(values)
         self.mem_use = num_bytes_with_padding
 
-    fn __getitem__(self, index: Int) raises -> T:
+    fn __init__(inout self, values: List[Optional[Scalar[T]]]):
+        var byte_width = sizeof[T]()
+        var num_bytes = len(values) * byte_width
+        var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
+        var ui8_ptr = Self._ptr_type.alloc(
+            num_bytes_with_padding, alignment=ALIGNMENT
+        )
+        memset_zero(ui8_ptr, num_bytes_with_padding)
+        var ptr = ui8_ptr.bitcast[T]()
+
+        var validity_list = List[Bool](len(values))
+
+        for i in range(values.size):
+            var val = values[i]
+            if val:
+                validity_list.append(True)
+                ptr[i] = val.value()
+            else:
+                validity_list.append(False)
+                ptr[i] = 0
+
+        self.value = ui8_ptr
+        self.validity = Bitmap(validity_list)
+        self.null_count = 0
+        self.view = ptr
+        self.length = len(values)
+        self.mem_use = num_bytes_with_padding
+
+    fn __getitem__(self, index: Int) raises -> Scalar[T]:
         if index < 0 or index >= self.length:
             raise Error("index out of range for ArrowFixedWidthVector")
-        return self.view.load(index)
+        return self.view[index]
 
     fn __len__(self) -> Int:
         return self.length
