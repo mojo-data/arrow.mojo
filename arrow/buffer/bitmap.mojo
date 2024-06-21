@@ -78,9 +78,9 @@ struct Bitmap(StringableRaising):
         var bitmask: UInt8 = 1 << (index % 8)
         return ((self._buffer[byte_index] & bitmask)).__bool__()
 
-    fn __getitem__(self, index: Int) raises -> Bool:
-        if index < 0 or index >= self.length:
-            raise Error("index out of range for Bitmap")
+    fn __getitem__(self, index: Int) -> Bool:
+        if not (0 <= index < self.length):
+            return False
         return self._unsafe_getitem(index)
 
     fn __len__(self) -> Int:
