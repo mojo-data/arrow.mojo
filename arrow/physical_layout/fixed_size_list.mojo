@@ -27,6 +27,10 @@ struct FixedSizedList[type: DType]:
         var offset_cursor: Int = 0
         for i in range(len(values)):
             # TODO: support nulls
+            if len(values[i]) != self.list_size:
+                raise Error(
+                    "FixedSizedList: list size mismatch on index: " + str(i)
+                )
             validity_list.append(True)
             for j in range(self.list_size):
                 self.value_buffer[offset_cursor] = values[i][j]
