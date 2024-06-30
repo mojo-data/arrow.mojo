@@ -2,6 +2,21 @@ from arrow.buffer.bitmap import Bitmap
 
 
 struct ArrowBooleanArray:
+    """A primitive value array represents an array of values each having
+    the same physical slot width typically measured in bytes, though the
+    spec also provides for bit-packed types (e.g. boolean values encoded
+    in bits).
+
+    Internally, the array contains a contiguous memory buffer whose
+    total size is at least as large as the slot width multiplied by the
+    array length. For bit-packed types, the size is rounded up to the
+    nearest byte.
+
+    The associated validity bitmap is contiguously allocated (as
+    described above) but does not need to be adjacent in memory to the
+    values buffer.
+    """
+
     var length: Int
     var null_count: Int
     var _validity: Bitmap
