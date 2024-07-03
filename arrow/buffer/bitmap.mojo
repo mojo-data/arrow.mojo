@@ -79,6 +79,16 @@ struct Bitmap(StringableRaising):
         return ((self._buffer[byte_index] & bitmask)).__bool__()
 
     fn __getitem__(self, index: Int) -> Bool:
+        """Get the value at the index. If the index is out of bounds, then
+        return False.
+
+        Args:
+            index: The index [0, len(self) -1].
+
+        Returns:
+            The value.
+        """
+
         if not (0 <= index < self.length):
             return False
         return self._unsafe_getitem(index)
