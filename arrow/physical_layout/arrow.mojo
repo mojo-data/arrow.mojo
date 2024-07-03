@@ -71,6 +71,16 @@ struct ArrowFixedWidthVector[T: DType]:
         self.mem_used = num_bytes_with_padding
 
     fn __getitem__(self, index: Int) -> Optional[Scalar[T]]:
+        """Get the value at the index. If the index is out of bounds or the
+        validity bitmap has that index set as not valid, then return None.
+
+        Args:
+            index: The index.
+
+        Returns:
+            The value.
+        """
+
         if not (0 <= index < self.length):
             return None
         if not self.validity[index]:
