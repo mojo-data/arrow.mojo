@@ -75,7 +75,7 @@ struct ArrowFixedWidthVector[T: DType]:
         validity bitmap has that index set as not valid, then return None.
 
         Args:
-            index: The index.
+            index: The index [0, len(self) -1].
 
         Returns:
             The value.
