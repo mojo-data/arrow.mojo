@@ -3,14 +3,13 @@ from arrow.arrow import Bitmap
 from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
 
 
-struct FixedSizedList[type: DType]:
-    alias element_type = Scalar[type]
+struct FixedSizedList[element_type: AnyTrivialRegType]:
     alias element_byte_width = sizeof[Self.element_type]()
 
     var length: Int
     var null_count: Int
     var validity: Bitmap
-    var value_buffer: DTypeBuffer[type]
+    var value_buffer: DTypeBuffer[element_type]
     var list_size: Int
 
     var mem_used: Int
@@ -18,7 +17,9 @@ struct FixedSizedList[type: DType]:
     fn __init__(inout self, values: List[List[Self.element_type]]) raises:
         self.length = len(values)
         self.list_size = len(values[0])
-        self.value_buffer = DTypeBuffer[type](self.list_size * len(values))
+        self.value_buffer = DTypeBuffer[element_type](
+            self.list_size * len(values)
+        )
 
         var validity_list = List[Bool](capacity=len(values))
         var offset_list = List[Int](capacity=len(values) + 1)

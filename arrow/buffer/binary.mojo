@@ -3,7 +3,7 @@ from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 
 @value
 struct BinaryBuffer:
-    alias _ptr_type = DTypePointer[DType.uint8]
+    alias _ptr_type = UnsafePointer[UInt8]
     var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
@@ -50,6 +50,12 @@ struct BinaryBuffer:
         for i in range(length):
             values.append(self._unsafe_getitem(start + i))
         return values
+
+    fn _unsafe_get_sequence(
+        self, start: Int, length: Int, inout bytes: List[UInt8]
+    ):
+        for i in range(length):
+            bytes[i] = self._unsafe_getitem(start + i)
 
     fn get_sequence(self, start: Int, length: Int) raises -> List[UInt8]:
         if start < 0 or start + length > self.length:

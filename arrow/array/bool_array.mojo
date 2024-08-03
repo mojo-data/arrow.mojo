@@ -34,7 +34,9 @@ struct ArrowBooleanArray:
                 self.null_count += 1
             else:
                 validity_list.append(True)
-                value_list.append(values[i])
+                value_list.append(
+                    values[i].or_else(False)
+                )  # TODO: pattern match instead of or_else
 
         self._validity = Bitmap(validity_list)
         self._buffer = Bitmap(value_list)

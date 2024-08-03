@@ -42,12 +42,13 @@ struct ArrowStringVector:
         var start = self.offsets[index]
         var length = self.offsets[index + 1] - start
 
-        var bytes = self.value_buffer._unsafe_get_sequence(
-            rebind[Int](start), rebind[Int](length)
+        var bytes = List[UInt8](
+            capacity=int(length) + 1
+        )  # null terminate string
+        self.value_buffer._unsafe_get_sequence(
+            rebind[Int](start), rebind[Int](length), bytes
         )
-        bytes.extend(
-            List(UInt8(0))
-        )  # TODO: null terminate string without copying
+
         return String(bytes)
 
     fn __len__(self) -> Int:

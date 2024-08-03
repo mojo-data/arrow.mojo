@@ -1,10 +1,9 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 
 
-struct DTypeBuffer[type: DType]:
-    alias _ptr_type = DTypePointer[type]
-    alias element_type = Scalar[type]
-    alias element_byte_width = sizeof[Self.element_type]()
+struct DTypeBuffer[element_type: AnyTrivialRegType]:
+    alias _ptr_type = UnsafePointer[element_type]
+    alias element_byte_width = sizeof[AnyTrivialRegType]()
     var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
@@ -18,7 +17,7 @@ struct DTypeBuffer[type: DType]:
         self._buffer = Self._ptr_type.alloc(alloc_count, alignment=ALIGNMENT)
         memset_zero(self._buffer, alloc_count)
 
-    fn __init__(inout self, values: List[Int]):
+    fn __init__(inout self, values: List[element_type]):
         self = Self(len(values))
         for i in range(len(values)):
             self._unsafe_setitem(i, values[i])

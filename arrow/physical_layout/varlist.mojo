@@ -3,15 +3,14 @@ from arrow.arrow import Bitmap
 from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
 
 
-struct VariableSizedList[type: DType]:
-    alias element_type = Scalar[type]
+struct VariableSizedList[element_type: AnyTrivialRegType]:
     alias element_byte_width = sizeof[Self.element_type]()
 
     var length: Int
     var null_count: Int
     var validity: Bitmap
     var offsets: OffsetBuffer64
-    var value_buffer: DTypeBuffer[type]
+    var value_buffer: DTypeBuffer[element_type]
 
     var mem_used: Int
 
@@ -25,7 +24,7 @@ struct VariableSizedList[type: DType]:
         var buffer_size = 0
         for i in range(len(values)):
             buffer_size += len(values[i])
-        self.value_buffer = DTypeBuffer[type](buffer_size)
+        self.value_buffer = DTypeBuffer[element_type](buffer_size)
 
         offset_list.append(0)
         var offset_cursor: Int = 0

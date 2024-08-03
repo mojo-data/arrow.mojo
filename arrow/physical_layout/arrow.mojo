@@ -1,8 +1,8 @@
-from memory.unsafe import Pointer
 from memory import memset_zero
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 from arrow.buffer.bitmap import Bitmap
 from arrow.buffer.offset import OffsetBuffer64
+from arrow.buffer.dtype import DTypeBuffer
 
 
 struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
@@ -10,45 +10,31 @@ struct ArrowFixedWidthVector[T: AnyTrivialRegType]:
     var length: Int
     var null_count: Int
     var validity: Bitmap
-    var value: Pointer[UInt8]
-    var view: Pointer[T]
+    var _value_buffer: DTypeBuffer[T]
 
     var mem_use: Int
 
-    fn __init__(inout self, values: List[T]):
-        var byte_width = sizeof[T]()
-        var num_bytes = len(values) * byte_width
-        var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
-        var ui8_ptr = Pointer[UInt8].alloc(
-            num_bytes_with_padding, alignment=ALIGNMENT
-        )
-        memset_zero(ui8_ptr, num_bytes_with_padding)
-        var ptr = ui8_ptr.bitcast[T]()
+    fn __init__(inout self, values: List[T]) raises:
+        self._value_buffer = DTypeBuffer[T](len(values))
 
         var validity_list = List[Bool](len(values))
 
         for i in range(values.size):
             validity_list.append(True)
-            var val = values[i]
-            ptr.store(i, val)
+            self._value_buffer[i] = values[i]
 
-        self.value = ui8_ptr
         self.validity = Bitmap(validity_list)
         self.null_count = 0
-        self.view = ptr
         self.length = len(values)
-        self.mem_use = num_bytes_with_padding
+        self.mem_use = self._value_buffer.mem_used + self.validity.mem_used
 
     fn __getitem__(self, index: Int) raises -> T:
         if index < 0 or index >= self.length:
             raise Error("index out of range for ArrowFixedWidthVector")
-        return self.view.load(index)
+        return self._value_buffer[index]
 
     fn __len__(self) -> Int:
         return self.length
-
-    fn __del__(owned self):
-        self.value.free()
 
 
 struct ArrowIntVector:
