@@ -3,7 +3,7 @@ from testing import assert_equal
 
 
 def test_ArrowIntVector():
-    var ints = List[Int]()
+    var ints = List[Int64]()
     ints.append(-11)
     ints.append(2)
     ints.append(4)
