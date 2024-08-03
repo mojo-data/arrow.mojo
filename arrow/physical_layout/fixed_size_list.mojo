@@ -3,7 +3,7 @@ from arrow.arrow import Bitmap
 from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
 
 
-struct FixedSizedList[element_type: AnyTrivialRegType]:
+struct FixedSizedList[element_type: DType]:
     alias element_byte_width = sizeof[Self.element_type]()
 
     var length: Int
@@ -14,7 +14,9 @@ struct FixedSizedList[element_type: AnyTrivialRegType]:
 
     var mem_used: Int
 
-    fn __init__(inout self, values: List[List[Self.element_type]]) raises:
+    fn __init__(
+        inout self, values: List[List[Scalar[Self.element_type]]]
+    ) raises:
         self.length = len(values)
         self.list_size = len(values[0])
         self.value_buffer = DTypeBuffer[element_type](
@@ -42,10 +44,10 @@ struct FixedSizedList[element_type: AnyTrivialRegType]:
         self.validity = Bitmap(validity_list)
         self.mem_used = self.value_buffer.mem_used
 
-    fn __getitem__(self, index: Int) raises -> List[Self.element_type]:
+    fn __getitem__(self, index: Int) raises -> List[Scalar[Self.element_type]]:
         if index < 0 or index >= self.length:
             raise Error("index out of range for FixedSizedList")
-        var ret = List[Self.element_type](capacity=self.list_size)
+        var ret = List[Scalar[Self.element_type]](capacity=self.list_size)
         var offset = int(self.list_size * index)
         for i in range(self.list_size):
             ret.append(self.value_buffer[offset + i])
