@@ -44,11 +44,11 @@ struct VariableSizedList[element_type: DType]:
         self.offsets = OffsetBuffer64(offset_list)
         self.mem_used = self.value_buffer.mem_used + self.offsets.mem_used
 
-    fn __getitem__(self, index: Int) raises -> List[Self.element_type]:
+    fn __getitem__(self, index: Int) raises -> List[Scalar[Self.element_type]]:
         if index < 0 or index >= self.length:
             # TODO: Sprintf the index into the error
             raise Error("index out of range for ArrowVariableSizedList")
-        var ret = List[Self.element_type]()
+        var ret = List[Scalar[Self.element_type]]()
 
         var start: Int = int(self.offsets[index])
         var length: Int = int(self.offsets[index + 1] - start)
