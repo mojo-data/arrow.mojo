@@ -25,8 +25,8 @@ jobs:
       - name: Install mojo
         run: |
           curl -s https://get.modular.com | sh -
-          modular install mojo
-          echo "/home/runner/.modular/pkg/packages.modular.com_mojo/bin:$PATH" >> $GITHUB_PATH
+          modular install nightly/mojo
+          echo "/home/runner/.modular/pkg/packages.modular.com_nightly_mojo/bin:$PATH" >> $GITHUB_PATH
 
       - name: checks
         run: |

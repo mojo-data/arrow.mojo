@@ -13,7 +13,7 @@ struct ArrowStringVector:
 
     fn __init__(inout self, values: List[String]):
         var validity_list = List[Bool](capacity=len(values))
-        var offset_list = List[Int](capacity=len(values) + 1)
+        var offset_list = List[Int64](capacity=len(values) + 1)
 
         # Calculate the size of the buffer and allocate it
         var buffer_size = 0
@@ -46,7 +46,7 @@ struct ArrowStringVector:
             capacity=int(length) + 1
         )  # null terminate string
         self.value_buffer._unsafe_get_sequence(
-            rebind[Int](start), rebind[Int](length), bytes
+            rebind[Int64](start), rebind[Int](length), bytes
         )
 
         return String(bytes)
