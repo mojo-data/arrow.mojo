@@ -25,6 +25,7 @@ jobs:
       - name: Install mojo
         run: |
           curl -s https://get.modular.com | sh -
+          modular auth 42069
           modular install nightly/mojo
           echo "/home/runner/.modular/pkg/packages.modular.com_nightly_mojo/bin:$PATH" >> $GITHUB_PATH
 
