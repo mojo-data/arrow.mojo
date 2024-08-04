@@ -58,11 +58,3 @@ struct DTypeBuffer[element_type: DType]:
 
     fn __del__(owned self):
         self._buffer.free()
-
-
-# test code
-
-
-def main():
-    var buffer = DTypeBuffer[Int32.element_type](10)
-    print(buffer[0])
