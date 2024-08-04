@@ -1,4 +1,3 @@
-from memory.unsafe import Pointer
 from memory import memset_zero
 from arrow.util import PADDING, ALIGNMENT, get_num_bytes_with_padding
 
@@ -24,12 +23,10 @@ struct Bitmap(StringableRaising):
     ```
     """
 
-    alias _ptr_type = DTypePointer[DType.uint8]
+    alias _ptr_type = UnsafePointer[UInt8]
     var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
-    # TODO maybe buffers shouldn't have length and mem_used, just size.
-    # The layouts that use the buffers can keep track of their length.
 
     fn __init__(inout self, length_unpadded: Int):
         """Creates a new Bitmap that supports at least `length_unpadded` elements.
@@ -42,8 +39,8 @@ struct Bitmap(StringableRaising):
         var num_bytes = (length_unpadded + 7) // 8
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
 
-        self._buffer = Self._ptr_type.alloc(
-            num_bytes_with_padding, alignment=ALIGNMENT
+        self._buffer = Self._ptr_type.alloc[alignment=ALIGNMENT](
+            num_bytes_with_padding
         )
         memset_zero(self._buffer, num_bytes_with_padding)
         self.length = length_unpadded

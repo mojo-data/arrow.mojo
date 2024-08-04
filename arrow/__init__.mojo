@@ -1,5 +1,5 @@
 from arrow.physical_layout.arrow import (
-    ArrowFixedWidthVector,
+    # ArrowFixedWidthVector,
     ArrowIntVector,
 )
 
