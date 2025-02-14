@@ -8,13 +8,13 @@ struct BinaryBuffer:
     var length: Int
     var mem_used: Int
 
-    fn __init__(inout self, length_unpadded: Int):
+    fn __init__(mut self, length_unpadded: Int):
         self.length = length_unpadded
         self.mem_used = get_num_bytes_with_padding(length_unpadded)
         self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
         memset_zero(self._buffer, self.mem_used)
 
-    fn __init__(inout self, values: List[UInt8]):
+    fn __init__(mut self, values: List[UInt8]):
         self = Self(len(values))
         self._unsafe_set_sequence(0, values)
 
@@ -52,7 +52,7 @@ struct BinaryBuffer:
         return values
 
     fn _unsafe_get_sequence(
-        self, start: Int, length: Int, inout bytes: List[UInt8]
+        self, start: Int, length: Int, mut bytes: List[UInt8]
     ):
         for i in range(length):
             bytes[i] = self._unsafe_getitem(start + i)
@@ -67,12 +67,12 @@ struct BinaryBuffer:
 
     # Lifecycle methods
 
-    fn __moveinit__(inout self, owned existing: BinaryBuffer):
+    fn __moveinit__(mut self, owned existing: BinaryBuffer):
         self._buffer = existing._buffer
         self.length = existing.length
         self.mem_used = existing.mem_used
 
-    fn __copyinit__(inout self, existing: BinaryBuffer):
+    fn __copyinit__(mut self, existing: BinaryBuffer):
         self.length = existing.length
         self.mem_used = existing.mem_used
         self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)

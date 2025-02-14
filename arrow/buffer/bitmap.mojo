@@ -1,4 +1,4 @@
-from memory import memset_zero
+from memory import memset_zero, UnsafePointer
 from arrow.util import PADDING, ALIGNMENT, get_num_bytes_with_padding
 
 
@@ -23,12 +23,12 @@ struct Bitmap(StringableRaising):
     ```
     """
 
-    alias _ptr_type = UnsafePointer[UInt8]
+    alias _ptr_type = UnsafePointer[UInt8, alignment=ALIGNMENT]
     var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
 
-    fn __init__(inout self, length_unpadded: Int):
+    fn __init__(mut self, length_unpadded: Int):
         """Creates a new Bitmap that supports at least `length_unpadded` elements.
 
         Args:
@@ -39,14 +39,12 @@ struct Bitmap(StringableRaising):
         var num_bytes = (length_unpadded + 7) // 8
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
 
-        self._buffer = Self._ptr_type.alloc[alignment=ALIGNMENT](
-            num_bytes_with_padding
-        )
+        self._buffer = Self._ptr_type.alloc(num_bytes_with_padding)
         memset_zero(self._buffer, num_bytes_with_padding)
         self.length = length_unpadded
         self.mem_used = num_bytes_with_padding
 
-    fn __init__(inout self, bools: List[Bool]):
+    fn __init__(mut self, bools: List[Bool]):
         self = Self(len(bools))
 
         for i in range(len(bools)):
@@ -86,15 +84,13 @@ struct Bitmap(StringableRaising):
     fn __del__(owned self):
         self._buffer.free()
 
-    fn __moveinit__(inout self, owned existing: Bitmap):
+    fn __moveinit__(mut self, owned existing: Bitmap):
         self._buffer = existing._buffer
         self.length = existing.length
         self.mem_used = existing.mem_used
 
-    fn __copyinit__(inout self, existing: Bitmap):
-        self._buffer = Self._ptr_type.alloc(
-            existing.mem_used, alignment=ALIGNMENT
-        )
+    fn __copyinit__(mut self, existing: Bitmap):
+        self._buffer = Self._ptr_type.alloc(existing.mem_used)
         for i in range(existing.mem_used):
             self._buffer[i] = existing._buffer[i]
         self.length = existing.length

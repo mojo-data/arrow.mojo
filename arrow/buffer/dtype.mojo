@@ -9,7 +9,7 @@ struct DTypeBuffer[element_type: DType]:
     var length: Int
     var mem_used: Int
 
-    fn __init__(inout self, length: Int = 0):
+    fn __init__(mut self, length: Int = 0):
         self.length = length
         var num_bytes = self.length * Self.element_byte_width
         self.mem_used = get_num_bytes_with_padding(num_bytes)
@@ -18,7 +18,7 @@ struct DTypeBuffer[element_type: DType]:
         self._buffer = Self._ptr_type.alloc(alloc_count, alignment=ALIGNMENT)
         memset_zero(self._buffer, alloc_count)
 
-    fn __init__(inout self, values: List[Self._scalar_type]):
+    fn __init__(mut self, values: List[Self._scalar_type]):
         self = Self(len(values))
         for i in range(len(values)):
             self._unsafe_setitem(i, values[i])
@@ -44,12 +44,12 @@ struct DTypeBuffer[element_type: DType]:
     fn __len__(self) -> Int:
         return self.length
 
-    fn __moveinit__(inout self, owned existing: Self):
+    fn __moveinit__(mut self, owned existing: Self):
         self._buffer = existing._buffer
         self.length = existing.length
         self.mem_used = existing.mem_used
 
-    fn __copyinit__(inout self, existing: Self):
+    fn __copyinit__(mut self, existing: Self):
         self.length = existing.length
         self.mem_used = existing.mem_used
         self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)

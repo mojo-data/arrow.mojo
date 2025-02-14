@@ -11,7 +11,7 @@ struct ArrowStringVector:
     var value_buffer: BinaryBuffer
     var mem_used: Int
 
-    fn __init__(inout self, values: List[String]):
+    fn __init__(mut self, values: List[String]):
         var validity_list = List[Bool](capacity=len(values))
         var offset_list = List[Int32](capacity=len(values) + 1)
 

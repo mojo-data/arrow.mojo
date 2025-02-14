@@ -1,0 +1,17 @@
+[project]
+authors = ["Samay Kapadia <fake@email.com>"]
+channels = [
+    "https://conda.modular.com/max-nightly",
+    "https://conda.modular.com/max",
+    "https://repo.prefix.dev/modular-community",
+    "conda-forge",
+]
+description = "Implementing Apache Arrow in Modular's Mojo"
+name = "arrow.mojo"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+max = ">=25.2.0.dev2025021305,<26"

@@ -1,6 +1,6 @@
 .PHONY: test
 test: fmt
-	mojo test -I .
+	magic run mojo test -I .
 
 .PHONY: build
 build: fmt
@@ -13,7 +13,7 @@ clean:
 
 .PHONY: fmt
 fmt: 
-	@mojo format arrow test
+	@magic run mojo format arrow test
 
 .PHONY: setup
 setup:

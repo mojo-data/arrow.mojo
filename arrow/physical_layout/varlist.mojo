@@ -14,9 +14,7 @@ struct VariableSizedList[element_type: DType]:
 
     var mem_used: Int
 
-    fn __init__(
-        inout self, values: List[List[Scalar[Self.element_type]]]
-    ) raises:
+    fn __init__(mut self, values: List[List[Scalar[Self.element_type]]]) raises:
         self.length = len(values)
 
         var validity_list = List[Bool](capacity=len(values))

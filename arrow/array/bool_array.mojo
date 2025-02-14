@@ -1,4 +1,5 @@
 from arrow.buffer.bitmap import Bitmap
+from collections import Optional
 
 
 struct ArrowBooleanArray:
@@ -8,21 +9,21 @@ struct ArrowBooleanArray:
     var _buffer: Bitmap
     var mem_used: Int
 
-    fn __init__(inout self, values: List[Bool]):
+    fn __init__(mut self, values: List[Bool]):
         self.length = len(values)
         self.null_count = 0
         self._validity = Bitmap(List(True) * len(values))
         self._buffer = Bitmap(values)
         self.mem_used = self._validity.mem_used + self._buffer.mem_used
 
-    fn __init__(inout self, length: Int):
+    fn __init__(mut self, length: Int):
         self.length = length
         self.null_count = 0
         self._validity = Bitmap(List(True) * length)
         self._buffer = Bitmap(length)
         self.mem_used = self._validity.mem_used + self._buffer.mem_used
 
-    fn __init__(inout self, values: List[Optional[Bool]]):
+    fn __init__(mut self, values: List[Optional[Bool]]):
         self.length = len(values)
         self.null_count = 0
         var validity_list = List[Bool](capacity=len(values))
