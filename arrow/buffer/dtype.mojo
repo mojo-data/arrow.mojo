@@ -1,9 +1,11 @@
+from memory import UnsafePointer, memset_zero
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
+from sys.info import sizeof
 
 
 struct DTypeBuffer[element_type: DType]:
     alias _scalar_type = Scalar[element_type]
-    alias _ptr_type = UnsafePointer[Self._scalar_type]
+    alias _ptr_type = UnsafePointer[Self._scalar_type, alignment=ALIGNMENT]
     alias element_byte_width = sizeof[Scalar[element_type]]()
     var _buffer: Self._ptr_type
     var length: Int
@@ -15,7 +17,7 @@ struct DTypeBuffer[element_type: DType]:
         self.mem_used = get_num_bytes_with_padding(num_bytes)
 
         var alloc_count = self.mem_used // Self.element_byte_width
-        self._buffer = Self._ptr_type.alloc(alloc_count, alignment=ALIGNMENT)
+        self._buffer = Self._ptr_type.alloc(alloc_count)
         memset_zero(self._buffer, alloc_count)
 
     fn __init__(mut self, values: List[Self._scalar_type]):
@@ -52,7 +54,7 @@ struct DTypeBuffer[element_type: DType]:
     fn __copyinit__(mut self, existing: Self):
         self.length = existing.length
         self.mem_used = existing.mem_used
-        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
+        self._buffer = Self._ptr_type.alloc(self.mem_used)
         for i in range(self.mem_used):
             self._buffer[i] = existing._buffer[i]
 

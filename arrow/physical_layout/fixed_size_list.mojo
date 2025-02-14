@@ -1,6 +1,7 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 from arrow.arrow import Bitmap
 from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
+from sys.info import sizeof
 
 
 struct FixedSizedList[element_type: DType]:
@@ -30,7 +31,7 @@ struct FixedSizedList[element_type: DType]:
             # TODO: support nulls
             if len(values[i]) != self.list_size:
                 raise Error(
-                    "FixedSizedList: list size mismatch on index: " + str(i)
+                    "FixedSizedList: list size mismatch on index: " + String(i)
                 )
             validity_list.append(True)
             for j in range(self.list_size):
@@ -46,7 +47,7 @@ struct FixedSizedList[element_type: DType]:
         if index < 0 or index >= self.length:
             raise Error("index out of range for FixedSizedList")
         var ret = List[Scalar[Self.element_type]](capacity=self.list_size)
-        var offset = int(self.list_size * index)
+        var offset = Int(self.list_size * index)
         for i in range(self.list_size):
             ret.append(self.value_buffer[offset + i])
         return ret

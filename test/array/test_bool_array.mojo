@@ -1,4 +1,5 @@
 from testing import assert_equal
+from collections import Optional
 from arrow.array.bool_array import ArrowBooleanArray
 
 

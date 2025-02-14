@@ -1,4 +1,5 @@
 from arrow.arrow import ArrowFixedWidthBuffer
+from sys.info import sizeof
 
 
 def test_ints():
