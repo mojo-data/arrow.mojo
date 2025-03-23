@@ -1,6 +1,6 @@
-dist/
-.venv/
-install_id
-**/.DS_Store
-.scratch/
-.vscode/
+
+# pixi environments
+.pixi
+*.egg-info
+# magic environments
+.magic
