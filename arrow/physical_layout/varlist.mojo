@@ -1,8 +1,9 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
 from arrow.arrow import Bitmap
 from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
+from sys.info import sizeof
 
-
+ 
 struct VariableSizedList[element_type: DType]:
     alias element_byte_width = sizeof[Self.element_type]()
 
@@ -15,7 +16,7 @@ struct VariableSizedList[element_type: DType]:
     var mem_used: Int
 
     fn __init__(
-        inout self, values: List[List[Scalar[Self.element_type]]]
+        mut self, values: List[List[Scalar[Self.element_type]]]
     ) raises:
         self.length = len(values)
 
@@ -50,8 +51,8 @@ struct VariableSizedList[element_type: DType]:
             raise Error("index out of range for ArrowVariableSizedList")
         var ret = List[Scalar[Self.element_type]]()
 
-        var start: Int = int(self.offsets[index])
-        var length: Int = int(self.offsets[index + 1] - start)
+        var start: Int = Int(self.offsets[index])
+        var length: Int = Int(self.offsets[index + 1] - start)
         for i in range(length):
             ret.append(self.value_buffer[start + i])
         return ret

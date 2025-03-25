@@ -3,10 +3,10 @@ from arrow.buffer.binary import BinaryBuffer
 
 
 def list_equality(list1: List[UInt8], list2: List[UInt8]) -> Bool:
-    if list1.size != list2.size:
+    if len(list1) != len(list2):
         return False
 
-    for i in range(list1.size):
+    for i in range(len(list1)):
         if list1[i] != list2[i]:
             return False
 

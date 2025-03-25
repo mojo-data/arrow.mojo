@@ -6,7 +6,7 @@ def check_if_works(bool_list: List[Bool]) -> Bitmap:
     var bitmap = Bitmap(bool_list)
     var list_from_bitmap = bitmap.to_list()
 
-    for i in range(bool_list.size):
+    for i in range(len(bool_list)):
         assert_equal(bool_list[i], list_from_bitmap[i])
 
     return bitmap
