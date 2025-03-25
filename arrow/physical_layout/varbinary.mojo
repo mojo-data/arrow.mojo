@@ -54,7 +54,7 @@ struct ArrowStringVector:
         if index < 0 or index >= self.length:
             raise Error("index out of range for ArrowStringVector")
         var bytes = value.as_bytes()
-        self.value_buffer.set_sequence(Int(self.offsets[index]), List(bytes)) 
+        self.value_buffer.set_sequence(Int(self.offsets[index]), List(bytes))
 
     fn __len__(self) -> Int:
         return self.length

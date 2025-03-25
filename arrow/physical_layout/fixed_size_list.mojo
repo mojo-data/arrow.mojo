@@ -14,9 +14,7 @@ struct FixedSizedList[element_type: DType]:
 
     var mem_used: Int
 
-    fn __init__(
-        mut self, values: List[List[Scalar[Self.element_type]]]
-    ) raises:
+    fn __init__(mut self, values: List[List[Scalar[Self.element_type]]]) raises:
         self.length = len(values)
         self.list_size = len(values[0])
         self.value_buffer = DTypeBuffer[element_type](

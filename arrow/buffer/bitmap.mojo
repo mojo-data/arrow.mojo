@@ -40,9 +40,7 @@ struct Bitmap(StringableRaising):
         var num_bytes = (length_unpadded + 7) // 8
         var num_bytes_with_padding = get_num_bytes_with_padding(num_bytes)
 
-        self._buffer = Self._ptr_type.alloc(
-            num_bytes_with_padding
-        )
+        self._buffer = Self._ptr_type.alloc(num_bytes_with_padding)
         memset_zero(self._buffer, num_bytes_with_padding)
         self.length = length_unpadded
         self.mem_used = num_bytes_with_padding
@@ -93,9 +91,7 @@ struct Bitmap(StringableRaising):
         self.mem_used = existing.mem_used
 
     fn __copyinit__(mut self, existing: Bitmap):
-        self._buffer = Self._ptr_type.alloc(
-            existing.mem_used
-        )
+        self._buffer = Self._ptr_type.alloc(existing.mem_used)
         for i in range(existing.mem_used):
             self._buffer[i] = existing._buffer[i]
         self.length = existing.length

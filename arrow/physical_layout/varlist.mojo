@@ -3,7 +3,7 @@ from arrow.arrow import Bitmap
 from arrow.buffer import DTypeBuffer, OffsetBuffer32, OffsetBuffer64
 from sys.info import sizeof
 
- 
+
 struct VariableSizedList[element_type: DType]:
     alias element_byte_width = sizeof[Self.element_type]()
 
@@ -15,9 +15,7 @@ struct VariableSizedList[element_type: DType]:
 
     var mem_used: Int
 
-    fn __init__(
-        mut self, values: List[List[Scalar[Self.element_type]]]
-    ) raises:
+    fn __init__(mut self, values: List[List[Scalar[Self.element_type]]]) raises:
         self.length = len(values)
 
         var validity_list = List[Bool](capacity=len(values))

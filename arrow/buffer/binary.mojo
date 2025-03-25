@@ -47,7 +47,8 @@ struct BinaryBuffer:
         self._unsafe_set_sequence(start, values)
 
     fn _unsafe_get_sequence(self, start: Int, length: Int) -> List[UInt8]:
-        """Build a new List of UInt8 from the BinaryBuffer starting at `start` for `length` bytes.""" 
+        """Build a new List of UInt8 from the BinaryBuffer starting at `start` for `length` bytes.
+        """
 
         var values = List[UInt8](capacity=length)
         for i in range(length):
