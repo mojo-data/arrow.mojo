@@ -11,14 +11,14 @@ struct ArrowStringVector:
     var value_buffer: BinaryBuffer
     var mem_used: Int
 
-    fn __init__(inout self, values: List[String]):
+    fn __init__(mut self, values: List[String]):
         var validity_list = List[Bool](capacity=len(values))
         var offset_list = List[Int32](capacity=len(values) + 1)
 
         # Calculate the size of the buffer and allocate it
         var buffer_size = 0
         for i in range(len(values)):
-            buffer_size += values[i]._buffer.size
+            buffer_size += len(values[i]._buffer)
         self.value_buffer = BinaryBuffer(buffer_size)
 
         offset_list.append(0)
@@ -26,7 +26,7 @@ struct ArrowStringVector:
         for i in range(len(values)):
             validity_list.append(True)
             var bytes = values[i].as_bytes()
-            self.value_buffer._unsafe_set_sequence(offset_cursor, bytes)
+            self.value_buffer._unsafe_set_sequence(offset_cursor, List(bytes))
             offset_cursor += len(bytes)
             offset_list.append(offset_cursor)
 
@@ -43,12 +43,18 @@ struct ArrowStringVector:
         var length = self.offsets[index + 1] - start
 
         var bytes = self.value_buffer._unsafe_get_sequence(
-            int(start), int(length)
+            Int(start), Int(length)
         )
 
         bytes.extend(List[UInt8](0))
-        var ret = String(bytes)
+        var ret = String(buffer=bytes)
         return ret
+
+    fn __setitem__(self, index: Int, value: String) raises:
+        if index < 0 or index >= self.length:
+            raise Error("index out of range for ArrowStringVector")
+        var bytes = value.as_bytes()
+        self.value_buffer.set_sequence(Int(self.offsets[index]), List(bytes))
 
     fn __len__(self) -> Int:
         return self.length

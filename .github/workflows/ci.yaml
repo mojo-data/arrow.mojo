@@ -22,18 +22,16 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - name: Install mojo
+      - name: Install magic
         run: |
-          curl -s https://get.modular.com | sh -
-          modular auth 42069
-          modular install nightly/mojo
-          echo "/home/runner/.modular/pkg/packages.modular.com_nightly_mojo/bin:$PATH" >> $GITHUB_PATH
+          curl -ssL https://magic.modular.com/6b3752cd-debc-45dd-b249-5d4941e1c18c | bash
+          echo "/home/runner/.modular/bin:$PATH" >> $GITHUB_PATH
+          /home/runner/.modular/bin/magic project platform add linux-64
 
       - name: checks
         run: |
-          pip install -q pre-commit
-          pre-commit run -a
+          /home/runner/.modular/bin/magic run pre-commit run -a
 
       - name: tests
         run: |
-          mojo test -I .
+          /home/runner/.modular/bin/magic run test

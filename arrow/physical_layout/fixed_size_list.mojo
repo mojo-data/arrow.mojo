@@ -14,9 +14,7 @@ struct FixedSizedList[element_type: DType]:
 
     var mem_used: Int
 
-    fn __init__(
-        inout self, values: List[List[Scalar[Self.element_type]]]
-    ) raises:
+    fn __init__(mut self, values: List[List[Scalar[Self.element_type]]]) raises:
         self.length = len(values)
         self.list_size = len(values[0])
         self.value_buffer = DTypeBuffer[element_type](
@@ -32,7 +30,7 @@ struct FixedSizedList[element_type: DType]:
             # TODO: support nulls
             if len(values[i]) != self.list_size:
                 raise Error(
-                    "FixedSizedList: list size mismatch on index: " + str(i)
+                    "FixedSizedList: list size mismatch on index: " + String(i)
                 )
             validity_list.append(True)
             for j in range(self.list_size):
@@ -48,7 +46,7 @@ struct FixedSizedList[element_type: DType]:
         if index < 0 or index >= self.length:
             raise Error("index out of range for FixedSizedList")
         var ret = List[Scalar[Self.element_type]](capacity=self.list_size)
-        var offset = int(self.list_size * index)
+        var offset = Int(self.list_size * index)
         for i in range(self.list_size):
             ret.append(self.value_buffer[offset + i])
         return ret

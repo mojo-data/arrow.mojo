@@ -1,20 +1,21 @@
 from arrow.util import ALIGNMENT, get_num_bytes_with_padding
+from memory import memset_zero, UnsafePointer
 
 
 @value
 struct BinaryBuffer:
-    alias _ptr_type = UnsafePointer[UInt8]
+    alias _ptr_type = UnsafePointer[UInt8, alignment=ALIGNMENT]
     var _buffer: Self._ptr_type
     var length: Int
     var mem_used: Int
 
-    fn __init__(inout self, length_unpadded: Int):
+    fn __init__(mut self, length_unpadded: Int):
         self.length = length_unpadded
         self.mem_used = get_num_bytes_with_padding(length_unpadded)
-        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
+        self._buffer = Self._ptr_type.alloc(self.mem_used)
         memset_zero(self._buffer, self.mem_used)
 
-    fn __init__(inout self, values: List[UInt8]):
+    fn __init__(mut self, values: List[UInt8]):
         self = Self(len(values))
         self._unsafe_set_sequence(0, values)
 
@@ -46,13 +47,16 @@ struct BinaryBuffer:
         self._unsafe_set_sequence(start, values)
 
     fn _unsafe_get_sequence(self, start: Int, length: Int) -> List[UInt8]:
+        """Build a new List of UInt8 from the BinaryBuffer starting at `start` for `length` bytes.
+        """
+
         var values = List[UInt8](capacity=length)
         for i in range(length):
             values.append(self._unsafe_getitem(start + i))
         return values
 
     fn _unsafe_get_sequence(
-        self, start: Int, length: Int, inout bytes: List[UInt8]
+        self, start: Int, length: Int, mut bytes: List[UInt8]
     ):
         for i in range(length):
             bytes[i] = self._unsafe_getitem(start + i)
@@ -67,15 +71,15 @@ struct BinaryBuffer:
 
     # Lifecycle methods
 
-    fn __moveinit__(inout self, owned existing: BinaryBuffer):
+    fn __moveinit__(mut self, owned existing: BinaryBuffer):
         self._buffer = existing._buffer
         self.length = existing.length
         self.mem_used = existing.mem_used
 
-    fn __copyinit__(inout self, existing: BinaryBuffer):
+    fn __copyinit__(mut self, existing: BinaryBuffer):
         self.length = existing.length
         self.mem_used = existing.mem_used
-        self._buffer = Self._ptr_type.alloc(self.mem_used, alignment=ALIGNMENT)
+        self._buffer = Self._ptr_type.alloc(self.mem_used)
         for i in range(self.mem_used):
             self._buffer[i] = existing._buffer[i]
 

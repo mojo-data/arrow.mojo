@@ -14,7 +14,7 @@ from arrow.buffer.dtype import DTypeBuffer
 
 #     var mem_use: Int
 
-#     fn __init__(inout self, values: List[Scalar[T]]) raises:
+#     fn __init__(mut self, values: List[Scalar[T]]) raises:
 #         self._value_buffer = DTypeBuffer[Scalar[T]](len(values))
 
 #         var validity_list = List[Bool](len(values))
@@ -49,12 +49,12 @@ struct ArrowIntVector:
     var value_buffer: OffsetBuffer64
     var mem_used: Int
 
-    fn __init__(inout self, values: List[Int64]):
+    fn __init__(mut self, values: List[Int64]):
         self.length = len(values)
         self.value_buffer = OffsetBuffer64(values)
 
         var validity_list = List[Bool](capacity=len(values))
-        for i in range(values.size):
+        for i in range(len(values)):
             validity_list.append(True)
             var val = values[i]
             self.value_buffer._unsafe_setitem(i, val)
