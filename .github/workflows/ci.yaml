@@ -26,6 +26,7 @@ jobs:
         run: |
           curl -ssL https://magic.modular.com/6b3752cd-debc-45dd-b249-5d4941e1c18c | bash
           echo "/home/runner/.modular/bin:$PATH" >> $GITHUB_PATH
+          magic project platform add linux-64
 
       - name: checks
         run: |
