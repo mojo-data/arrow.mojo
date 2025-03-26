@@ -26,12 +26,12 @@ jobs:
         run: |
           curl -ssL https://magic.modular.com/6b3752cd-debc-45dd-b249-5d4941e1c18c | bash
           echo "/home/runner/.modular/bin:$PATH" >> $GITHUB_PATH
-          magic project platform add linux-64
+          /home/runner/.modular/bin/magic project platform add linux-64
 
       - name: checks
         run: |
-          magic run pre-commit run -a
+          /home/runner/.modular/bin/magic run pre-commit run -a
 
       - name: tests
         run: |
-          magic run test
+          /home/runner/.modular/bin/magic run test
