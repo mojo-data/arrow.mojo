@@ -1,5 +1,5 @@
 [project]
-authors = ["Marius Seritan <39998+winding-lines@users.noreply.github.com>"]
+authors = []
 channels = ["https://conda.modular.com/max-nightly", "https://conda.modular.com/max", "https://repo.prefix.dev/modular-community", "conda-forge"]
 name = "arrow"
 platforms = ["osx-arm64", "linux-64"]
